@@ -68,7 +68,9 @@ class UserProvider extends ChangeNotifier {
           changeScreen(
             context,
             ResetPasswordPage(
-                title: "Please change your password after the first login."),
+              title: "Please change your password after the first login.",
+              user: _user,
+            ),
           );
         }
       } else {
@@ -81,29 +83,7 @@ class UserProvider extends ChangeNotifier {
     } catch (e) {
       print(e);
       // show retry dialog
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => Theme(
-          data: ThemeData(
-            colorScheme: ColorScheme.light().copyWith(
-              primary: Constant.primaryColor,
-            ),
-          ),
-          child: AlertDialog(
-            title: Text("Error occured"),
-            content: Text("Please try again later"),
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  popScreen(context);
-                },
-                child: Text('OK'),
-              )
-            ],
-          ),
-        ),
-      );
+      AppProvider.showRetryDialog(context);
     }
   }
 

@@ -27,7 +27,11 @@ class LandingPage extends StatelessWidget {
                 child: FlatButton(
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
                   onPressed: () {
-                    changeScreen(context, ResetPasswordPage());
+                    changeScreen(
+                        context,
+                        ResetPasswordPage(
+                          user: null,
+                        ));
                   },
                   child: Text(
                     'Registration Now',

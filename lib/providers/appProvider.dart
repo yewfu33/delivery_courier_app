@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:http/http.dart' as http;
@@ -70,6 +71,32 @@ class AppProvider extends ChangeNotifier {
       print(e);
       return null;
     }
+  }
+
+  static void showRetryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Constant.primaryColor,
+          ),
+        ),
+        child: AlertDialog(
+          title: Text("Error occured"),
+          content: Text("Please try again later"),
+          actions: [
+            FlatButton(
+              onPressed: () {
+                popScreen(context);
+              },
+              child: Text('OK'),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   static void openCustomDialog(
