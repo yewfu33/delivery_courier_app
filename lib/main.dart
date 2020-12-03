@@ -15,6 +15,8 @@ import 'package:flutter_config/flutter_config.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'model/user.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -48,11 +50,11 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    UserProvider auth = Provider.of<UserProvider>(context);
+    final UserProvider auth = Provider.of<UserProvider>(context);
 
-    return FutureBuilder(
-      future: auth.initUser,
-      builder: (context, snapshot) {
+    return StreamBuilder(
+      stream: auth.validateAuthState(),
+      builder: (_, AsyncSnapshot<User> snapshot) {
         // Check for errors
         if (snapshot.hasError) {
           return Scaffold(
@@ -65,7 +67,7 @@ class MyHomePage extends StatelessWidget {
           switch (auth.status) {
             case Status.Uninitialized:
               // show loading
-              return LoadingScaffold();
+              return const LoadingScaffold();
 
             case Status.Unauthenticated:
               return LandingPage();
@@ -76,7 +78,8 @@ class MyHomePage extends StatelessWidget {
             case Status.Authenticated:
               return ChangeNotifierProvider.value(
                 value: AppProvider.user(
-                    user: Provider.of<UserProvider>(context).user),
+                  user: snapshot.data,
+                ),
                 child: AvailableOrdersPage(),
               );
 
@@ -86,7 +89,7 @@ class MyHomePage extends StatelessWidget {
         }
 
         // Otherwise, show something while waiting for future to complete
-        return LoadingScaffold();
+        return const LoadingScaffold();
       },
     );
   }
@@ -112,11 +115,11 @@ class LoadingScaffold extends StatelessWidget {
 class AvailableOrdersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    AppProvider provider = Provider.of<AppProvider>(context);
+    final AppProvider provider = Provider.of<AppProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pickup available orders'),
+        title: Text('Pickup order'),
         actions: <Widget>[
           Switch(
             value: true,
@@ -124,79 +127,77 @@ class AvailableOrdersPage extends StatelessWidget {
             activeColor: Colors.white,
           ),
         ],
-        centerTitle: true,
       ),
       drawer: MyDrawer(),
-      body: ConstrainedBox(
-        constraints:
-            BoxConstraints(minHeight: MediaQuery.of(context).size.height),
-        child: Container(
-          height: double.infinity,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      //   'Web, 1 August',
-                      DateFormat('EEEE, dd MMM').format(DateTime.now()),
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    //   'Web, 1 August',
+                    DateFormat('EEEE, dd MMM').format(DateTime.now()),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Icon(Icons.filter_list)
-                  ],
-                ),
+                  ),
+                  const Icon(Icons.filter_list)
+                ],
               ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    /// todo refresh
-                  },
-                  child: SingleChildScrollView(
-                    physics: ScrollPhysics(),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height),
-                      child: Container(
-                        width: double.infinity,
-                        child: FutureBuilder<List<OrderModel>>(
-                            future: provider.orders,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting)
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 25),
-                                  child: const Center(
-                                      child: CircularProgressIndicator()),
-                                );
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  /// todo refresh
+                },
+                child: SingleChildScrollView(
+                  physics: ScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height),
+                    child: Container(
+                      width: double.infinity,
+                      child: FutureBuilder<List<OrderModel>>(
+                          future: provider.orders,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting)
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                            Constant.primaryColor),
+                                  ),
+                                ),
+                              );
 
-                              final orders = snapshot.data;
+                            final orders = snapshot.data;
 
-                              if (orders == null || orders.length == 0)
-                                return Padding(
-                                    padding: const EdgeInsets.all(30),
-                                    child: const Text(
-                                        'No orders avaiable at the moment.'));
-                              else
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: orders
-                                      .map((o) => PickOrderList(orderModel: o))
-                                      .toList(),
-                                );
-                            }),
-                      ),
+                            if (orders == null || orders.length == 0)
+                              return Padding(
+                                  padding: const EdgeInsets.all(30),
+                                  child: const Text(
+                                      'No orders avaiable at the moment.'));
+                            else
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: orders
+                                    .map((o) => PickOrderList(orderModel: o))
+                                    .toList(),
+                              );
+                          }),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

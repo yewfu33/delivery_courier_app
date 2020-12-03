@@ -74,10 +74,12 @@ class UserProvider extends ChangeNotifier {
           );
         }
       } else {
-        Map<String, dynamic> body = json.decode(result.body);
+        var body = json.decode(result.body);
 
         if (body["message"] != null) {
           AppProvider.openCustomDialog(context, "Error", body["message"], true);
+        } else {
+          AppProvider.showRetryDialog(context);
         }
       }
     } catch (e) {
@@ -90,16 +92,16 @@ class UserProvider extends ChangeNotifier {
   Future setUserPrefs(User u) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    print(_user.id);
-
     prefs.setInt("uid", u.id);
     prefs.setString("name", u.name);
     prefs.setString("phoneNum", u.phoneNum);
     prefs.setString("token", u.token);
+    prefs.setString("email", u.email);
+    prefs.setString("profile_pic", u.profilePic);
     prefs.setBool("onBoard", u.onBoard);
   }
 
-  Future setUserFromPrefs() async {
+  Future<User> setUserFromPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     User setUser = User();
@@ -108,32 +110,57 @@ class UserProvider extends ChangeNotifier {
     setUser.name = prefs.getString("name");
     setUser.phoneNum = prefs.getString("phoneNum");
     setUser.token = prefs.getString("token");
+    setUser.email = prefs.getString("email");
+    setUser.profilePic = prefs.getString("profile_pic");
     setUser.onBoard = prefs.getBool("onBoard");
 
     // assign private field user
     _user = setUser;
 
-    initUser = Future.delayed(Duration.zero, () => _user);
+    return _user;
   }
 
-  void validateAuthState() async {
+  Stream<User> validateAuthState() async* {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if (prefs.containsKey("uid")) {
       _status = Status.Authenticated;
       // set prefs value to user variable
       if (_user == null) {
-        await setUserFromPrefs();
+        var u = await setUserFromPrefs();
+        yield u;
       } else {
-        initUser = Future.delayed(Duration.zero, () => _user);
+        yield _user;
       }
     } else {
       _status = Status.Unauthenticated;
       // end the future
-      initUser = Future.delayed(Duration.zero, () => null);
+      yield null;
     }
+  }
 
-    notifyListeners();
+//   void validateAuthState() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+//     if (prefs.containsKey("uid")) {
+//       _status = Status.Authenticated;
+//       // set prefs value to user variable
+//       if (_user == null) {
+//         await setUserFromPrefs();
+//       } else {
+//         initUser = Future.delayed(Duration.zero, () => _user);
+//       }
+//     } else {
+//       _status = Status.Unauthenticated;
+//       // end the future
+//       initUser = Future.delayed(Duration.zero, () => null);
+//     }
+//   }
+
+  Future<String> readProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString("profile_pic");
   }
 
   Future signOut() async {

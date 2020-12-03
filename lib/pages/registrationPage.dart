@@ -16,166 +16,169 @@ class RegistrationPage extends StatelessWidget {
         title: Text('Registration'),
       ),
       body: ChangeNotifierProvider(
-        create: (_) => RegistrationViewModel(),
-        child: Consumer<RegistrationViewModel>(
-          builder: (_, model, __) => SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      model.showPickImageModal(context);
-                    },
-                    child: CircleAvatar(
-                      radius: 40,
-                      // backgroundColor: Color(Constant.primaryColor),
-                      backgroundImage: model.pImage == null
-                          ? AssetImage('assets/img/avatar.jpg')
-                          : FileImage(model.pImage),
-                      // child: Icon(Icons.camera_alt),
+          create: (_) => RegistrationViewModel(),
+          builder: (context, _) {
+            final model = context.watch<RegistrationViewModel>();
+
+            return SingleChildScrollView(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        model.showPickImageModal(context);
+                      },
+                      child: CircleAvatar(
+                        radius: 40,
+                        // backgroundColor: Color(Constant.primaryColor),
+                        backgroundImage: model.pImage == null
+                            ? AssetImage('assets/img/avatar.jpg')
+                            : FileImage(model.pImage),
+                        // child: Icon(Icons.camera_alt),
+                      ),
                     ),
-                  ),
-                  Form(
-                    key: model.formKey,
-                    autovalidate: model.autoValidateForm,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'This field is required.';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              model.registrationModel.name = value;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Name',
-                              contentPadding: EdgeInsets.zero,
+                    Form(
+                      key: model.formKey,
+                      autovalidate: model.autoValidateForm,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.trim().isEmpty) {
+                                  return 'This field is required.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                model.registrationModel.name = value;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Name',
+                                contentPadding: EdgeInsets.zero,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'This field is required.';
-                              }
-                              if (value == '+60 ') {
-                                return 'This field is required.';
-                              }
-                              return null;
-                            },
-                            controller: _phoneFieldController,
-                            onSaved: (value) {
-                              model.registrationModel.phoneNum =
-                                  value.substring(4);
-                            },
-                            inputFormatters: [
-                              CustomPhoneNumberFormatter(),
-                            ],
-                            keyboardType: TextInputType.phone,
-                            decoration: InputDecoration(
-                              labelText: 'Phone Number',
-                              contentPadding: EdgeInsets.zero,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.trim().isEmpty) {
+                                  return 'This field is required.';
+                                }
+                                if (value == '+60 ') {
+                                  return 'This field is required.';
+                                }
+                                return null;
+                              },
+                              controller: _phoneFieldController,
+                              onSaved: (value) {
+                                model.registrationModel.phoneNum =
+                                    value.substring(4);
+                              },
+                              inputFormatters: [
+                                CustomPhoneNumberFormatter(),
+                              ],
+                              keyboardType: TextInputType.phone,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                contentPadding: EdgeInsets.zero,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'This field is required.';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              model.registrationModel.email = value;
-                            },
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              contentPadding: EdgeInsets.zero,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.trim().isEmpty) {
+                                  return 'This field is required.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                model.registrationModel.email = value;
+                              },
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                contentPadding: EdgeInsets.zero,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: DropdownButtonFormField(
-                            items: model.vehicleTypeItem,
-                            validator: (value) =>
-                                value == null ? 'This field is required' : null,
-                            decoration: InputDecoration(
-                              labelText: 'Owned Vehicle Type',
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            onChanged: (value) {
-                              model.registrationModel.vehicleType = value;
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value.trim().isEmpty) {
-                                return 'This field is required.';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              model.registrationModel.vehiclePlateNo = value;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Vehicle Plate No',
-                              contentPadding: EdgeInsets.zero,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: DropdownButtonFormField(
+                              items: model.vehicleTypeItem,
+                              validator: (value) => value == null
+                                  ? 'This field is required'
+                                  : null,
+                              decoration: InputDecoration(
+                                labelText: 'Owned Vehicle Type',
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              onChanged: (value) {
+                                model.registrationModel.vehicleType = value;
+                              },
                             ),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.trim().isEmpty) {
+                                  return 'This field is required.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                model.registrationModel.vehiclePlateNo = value;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Vehicle Plate No',
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (model.validateForm()) {
-                            // save current context and move to upload document page
-                            //   print(registrationModel.toMap());
-                            changeScreen(
-                                context,
-                                ChangeNotifierProvider.value(
-                                  value: model,
-                                  child: UploadDocumentPage(),
-                                ));
-                          }
-                        },
-                        color: Constant.primaryColor,
-                        child: Text(
-                          'Next',
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 0.4,
-                            color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (model.validateForm()) {
+                              // save current context and move to upload document page
+                              //   print(registrationModel.toMap());
+                              changeScreen(
+                                  context,
+                                  ChangeNotifierProvider.value(
+                                    value: model,
+                                    child: UploadDocumentPage(),
+                                  ));
+                            }
+                          },
+                          color: Constant.primaryColor,
+                          child: Text(
+                            'Next',
+                            style: TextStyle(
+                              fontSize: 16,
+                              letterSpacing: 0.4,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),
-          ),
-        ),
-      ),
+            );
+          }),
     );
   }
 }

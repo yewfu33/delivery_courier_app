@@ -172,35 +172,18 @@ class RegistrationViewModel with ChangeNotifier {
             "You will receive email confirmation after your registration been approved",
             false);
       } else {
-        AppProvider.openCustomDialog(
-            context, "Server error occured", "Please try again later", false);
+        var body = json.decode(result?.body);
+
+        if (body["message"] != null) {
+          AppProvider.openCustomDialog(context, "Error", body["message"], true);
+        } else {
+          AppProvider.showRetryDialog(context);
+        }
       }
     } catch (e) {
       print(e);
       // show retry dialog
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => Theme(
-          data: ThemeData(
-            colorScheme: ColorScheme.light().copyWith(
-              primary: Constant.primaryColor,
-            ),
-          ),
-          child: AlertDialog(
-            title: Text("Error occured"),
-            content: Text("Please try again later"),
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              )
-            ],
-          ),
-        ),
-      );
+      AppProvider.showRetryDialog(context);
     } finally {
       isPosting = false;
       notifyListeners();

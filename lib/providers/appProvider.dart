@@ -20,21 +20,23 @@ class AppProvider extends ChangeNotifier {
     this.initOrder();
   }
 
-  void initOrder() {
-    _orders = getAllOrders().then((res) {
+  void initOrder() async {
+    try {
+      var res = await getAllOrders();
+
       if (res == null) throw Exception('failed to fetch pick order');
       print(res.statusCode.toString());
 
       if (res.statusCode == 200) {
-        return Future.value(_setOrderModel(res.body));
+        _orders = Future.value(_setOrderModel(res.body));
       } else {
         print(res.body);
-        return Future.value(null);
+        _orders = Future.value(null);
       }
-    }).catchError((err) {
-      print(err);
-      Future.value(null);
-    });
+    } catch (e) {
+      print(e);
+      _orders = Future.value(null);
+    }
   }
 
   Future<http.Response> getAllOrders() async {

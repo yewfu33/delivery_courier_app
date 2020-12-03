@@ -1,7 +1,6 @@
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/pages/loginPage.dart';
 import 'package:delivery_courier_app/pages/registrationPage.dart';
-import 'package:delivery_courier_app/pages/resetPasswordPage.dart';
 import 'package:delivery_courier_app/widgets/Slider.dart';
 import 'package:flutter/material.dart';
 
@@ -28,10 +27,9 @@ class LandingPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
                   onPressed: () {
                     changeScreen(
-                        context,
-                        ResetPasswordPage(
-                          user: null,
-                        ));
+                      context,
+                      RegistrationPage(),
+                    );
                   },
                   child: Text(
                     'Registration Now',
