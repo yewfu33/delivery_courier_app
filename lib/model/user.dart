@@ -3,6 +3,8 @@ class User {
   String name;
   String phoneNum;
   String token;
+  String email;
+  String profilePic;
   bool onBoard;
 
   User();
@@ -11,6 +13,8 @@ class User {
       : id = json['id'],
         name = json['name'],
         phoneNum = json['phone_num'],
+        email = json['email'],
+        profilePic = json['profile_pic'],
         token = json['token'],
         onBoard = json['onBoard'];
 }
