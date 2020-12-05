@@ -60,7 +60,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<UserProvider>();
+    final model = context.watch<UserProvider>();
 
     return Scaffold(
       appBar: AppBar(
