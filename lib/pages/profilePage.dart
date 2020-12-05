@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,9 @@ class ProfilePage extends StatelessWidget {
                       radius: 44,
                       backgroundImage: user.profilePic?.isEmpty ?? true
                           ? AssetImage('assets/img/avatar.jpg')
-                          : NetworkImage(Constant.imagePath + user.profilePic),
+                          : CachedNetworkImageProvider(Constant.serverName +
+                              Constant.imagePath +
+                              user.profilePic),
                     ),
                     const SizedBox(height: 5),
                     const OnlineIndicator(),

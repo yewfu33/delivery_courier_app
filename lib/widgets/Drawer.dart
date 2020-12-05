@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/pages/onTaskPage.dart';
@@ -30,7 +31,9 @@ class MyDrawer extends StatelessWidget {
                     radius: 25,
                     backgroundImage: user.profilePic?.isEmpty ?? true
                         ? AssetImage('assets/img/avatar.jpg')
-                        : NetworkImage(Constant.imagePath + user.profilePic),
+                        : CachedNetworkImageProvider(Constant.serverName +
+                            Constant.imagePath +
+                            user.profilePic),
                   ),
                   Container(
                     padding: const EdgeInsets.only(left: 10),
