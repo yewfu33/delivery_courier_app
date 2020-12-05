@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final UserProvider auth = Provider.of<UserProvider>(context);
+    final UserProvider auth = Provider.of<UserProvider>(context, listen: false);
 
     return StreamBuilder(
       stream: auth.validateAuthState(),
@@ -112,10 +112,16 @@ class LoadingScaffold extends StatelessWidget {
   }
 }
 
-class AvailableOrdersPage extends StatelessWidget {
+class AvailableOrdersPage extends StatefulWidget {
+  @override
+  _AvailableOrdersPageState createState() => _AvailableOrdersPageState();
+}
+
+class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
   @override
   Widget build(BuildContext context) {
-    final AppProvider provider = Provider.of<AppProvider>(context);
+    final AppProvider provider =
+        Provider.of<AppProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -129,75 +135,70 @@ class AvailableOrdersPage extends StatelessWidget {
         ],
       ),
       drawer: MyDrawer(),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    //   'Web, 1 August',
-                    DateFormat('EEEE, dd MMM').format(DateTime.now()),
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      //   'Web, 1 August',
+                      DateFormat('EEEE, dd MMM').format(DateTime.now()),
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.filter_list)
-                ],
-              ),
-            ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  /// todo refresh
-                },
-                child: SingleChildScrollView(
-                  physics: ScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height),
-                    child: Container(
-                      width: double.infinity,
-                      child: FutureBuilder<List<OrderModel>>(
-                          future: provider.orders,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting)
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                            Constant.primaryColor),
-                                  ),
-                                ),
-                              );
-
-                            final orders = snapshot.data;
-
-                            if (orders == null || orders.length == 0)
-                              return Padding(
-                                  padding: const EdgeInsets.all(30),
-                                  child: const Text(
-                                      'No orders avaiable at the moment.'));
-                            else
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: orders
-                                    .map((o) => PickOrderList(orderModel: o))
-                                    .toList(),
-                              );
-                          }),
-                    ),
-                  ),
+                    const Icon(Icons.filter_list)
+                  ],
                 ),
               ),
-            ),
-          ],
+              Flexible(
+                fit: FlexFit.loose,
+                child: Container(
+                  width: double.infinity,
+                  child: StreamBuilder<List<OrderModel>>(
+                      stream: provider.ordersStream(),
+                      builder: (_, snapshot) {
+                        // show loading during waiting state
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                    Constant.primaryColor),
+                              ),
+                            ),
+                          );
+                        } else {
+                          if (!snapshot.hasData || snapshot.data.length == 0)
+                            return Padding(
+                                padding: const EdgeInsets.all(30),
+                                child: const Text(
+                                    'No orders avaiable at the moment.'));
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: snapshot.data
+                                .map((o) => PickOrderList(orderModel: o))
+                                .toList(),
+                          );
+                        }
+                      }),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

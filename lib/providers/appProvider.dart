@@ -12,40 +12,37 @@ import '../constant.dart';
 class AppProvider extends ChangeNotifier {
   Future<List<OrderModel>> _orders;
 
-  final User user;
-
   get orders => _orders;
 
-  AppProvider.user({@required this.user}) {
-    this.initOrder();
-  }
+  final User user;
 
-  void initOrder() async {
-    try {
-      var res = await getAllOrders();
+  AppProvider.user({@required this.user});
 
-      if (res == null) throw Exception('failed to fetch pick order');
-      print(res.statusCode.toString());
+  Stream<List<OrderModel>> ordersStream() async* {
+    var res = await getAllOrders();
 
-      if (res.statusCode == 200) {
-        _orders = Future.value(_setOrderModel(res.body));
-      } else {
-        print(res.body);
-        _orders = Future.value(null);
-      }
-    } catch (e) {
-      print(e);
-      _orders = Future.value(null);
+    if (res == null) throw Exception('failed to fetch pick order');
+    print(res.statusCode.toString());
+
+    if (res.statusCode == 200) {
+      yield _setOrderModel(res.body);
+    } else {
+      print(res.body);
+      yield null;
     }
   }
 
   Future<http.Response> getAllOrders() async {
     try {
-      return await http.get(
+      var res = await http.get(
         Constant.serverName + Constant.orderPath,
       );
+
+      return res;
     } on SocketException catch (e) {
-      print("socket exception in \"getAllOrders\", " + e.toString());
+      print(
+          "socket exception in \"${Constant.serverName + Constant.orderPath}\", " +
+              e.toString());
       return null;
     } catch (e) {
       return null;
