@@ -72,7 +72,8 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  static void showRetryDialog(BuildContext context) {
+  static void showRetryDialog(BuildContext context,
+      {String message = "Please try again later"}) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -84,7 +85,7 @@ class AppProvider extends ChangeNotifier {
         ),
         child: AlertDialog(
           title: Text("Error occured"),
-          content: Text("Please try again later"),
+          content: Text(message),
           actions: [
             FlatButton(
               onPressed: () {

@@ -85,7 +85,7 @@ class UserProvider extends ChangeNotifier {
         if (body["message"] != null) {
           AppProvider.openCustomDialog(context, "Error", body["message"], true);
         } else {
-          AppProvider.showRetryDialog(context);
+          AppProvider.showRetryDialog(context, message: result.reasonPhrase);
         }
       }
     } catch (e) {
@@ -118,7 +118,7 @@ class UserProvider extends ChangeNotifier {
         if (body["message"] != null) {
           AppProvider.openCustomDialog(context, "Error", body["message"], true);
         } else {
-          AppProvider.showRetryDialog(context);
+          AppProvider.showRetryDialog(context, message: result.reasonPhrase);
         }
       }
     } catch (e) {
