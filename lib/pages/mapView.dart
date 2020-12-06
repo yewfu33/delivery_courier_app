@@ -16,13 +16,12 @@ class MapView extends StatelessWidget {
       appBar: AppBar(
         // backgroundColor: Colors.transparent,
         // elevation: 1.0,
-        leading: BackButton(),
+        leading: const BackButton(),
         title: Text('Order #${order.orderId}'),
         actions: [
           IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
-      //   floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       body: ChangeNotifierProvider.value(
         value: MapProvider.init(
           LatLng(order.latitude, order.longitude),

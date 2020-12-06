@@ -95,6 +95,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+// splash screen
 class LoadingScaffold extends StatelessWidget {
   const LoadingScaffold({
     Key key,
