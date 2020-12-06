@@ -77,7 +77,8 @@ class Panel extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 width: double.infinity,
                 child: RaisedButton(
                   onPressed: () {},
@@ -103,10 +104,8 @@ class Panel extends StatelessWidget {
                   children: [
                     Text(
                       'Delivery Info',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -119,183 +118,242 @@ class Panel extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(Icons.access_time),
-                      SizedBox(width: 8),
+                      const Icon(Icons.access_time),
+                      const SizedBox(width: 8),
                       Text(
                         '3.50 PM - Pick-Up',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ],
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person),
-                          SizedBox(width: 10),
-                          Text('David Smith'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(Icons.phone),
-                          SizedBox(width: 10),
-                          Text('+60167970741'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Icon(Icons.location_on),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              '5.13 & 5.14 5th Floor Wisma Central Jalan Ampang',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                              softWrap: true,
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey[300],
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.near_me),
-                              onPressed: () {},
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: FlatButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.call),
-                              color: Colors.grey[300],
-                              label: Text('Call'),
-                            ),
-                          ),
-                          VerticalDivider(),
-                          Expanded(
-                            child: FlatButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.message),
-                              color: Colors.grey[300],
-                              label: Text('Message'),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                child: Column(
-                  children: [
-                    GreyBoxContainer(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Signatures',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Icon(Icons.add, size: 24),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 14),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      children: [
-                        Text('No Signature yet'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                child: Column(
-                  children: [
-                    GreyBoxContainer(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Payments',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 14),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Table(
-                        children: [
-                          TableRow(
-                            children: [
-                              CustomTableCell(content: Text('Your Commission')),
-                              CustomTableCell(content: Text('Rm 4')),
-                            ],
-                          ),
-                          TableRow(
-                            children: [
-                              CustomTableCell(content: Text('Payment Method')),
-                              CustomTableCell(content: Text('Cash Payment')),
-                            ],
-                          ),
-                          TableRow(
-                            children: [
-                              CustomTableCell(content: Text('Payment Status')),
-                              CustomTableCell(content: Text('Pending')),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
+              UserInfoSection(),
+              SignaturesSection(),
+              PaymentSection(),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class UserInfoSection extends StatelessWidget {
+  const UserInfoSection({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.person),
+                const SizedBox(width: 10),
+                Text('David Smith'),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.phone),
+                const SizedBox(width: 10),
+                Text('+60167970741'),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Icon(Icons.location_on),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '5.13 & 5.14 5th Floor Wisma Central Jalan Ampang',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    softWrap: true,
+                  ),
+                ),
+                // Container(
+                //   decoration: BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     color: Colors.grey[300],
+                //   ),
+                //   child: IconButton(
+                //     icon: Icon(Icons.near_me),
+                //     onPressed: () {},
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.event_note),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec feugiat elementum eros sed tincidunt. Praesent consequat consectetur justo, in elementum justo porta sed.',
+                    softWrap: true,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            child: Row(
+              children: [
+                Expanded(
+                  child: FlatButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.call),
+                    color: Colors.grey[300],
+                    label: Text('Call'),
+                  ),
+                ),
+                const VerticalDivider(),
+                Expanded(
+                  child: FlatButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.near_me),
+                    color: Colors.grey[300],
+                    label: Text('Direction'),
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class SignaturesSection extends StatelessWidget {
+  const SignaturesSection({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      child: Column(
+        children: [
+          GreyBoxContainer(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Signatures',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+                Icon(Icons.add, size: 24),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              Text('No Signature yet'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PaymentSection extends StatelessWidget {
+  const PaymentSection({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      child: Column(
+        children: [
+          GreyBoxContainer(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Payments',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Table(
+              children: [
+                TableRow(
+                  children: [
+                    CustomTableCell(content: Text('Your Commission')),
+                    CustomTableCell(content: Text('Rm 4')),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    CustomTableCell(content: Text('Payment Method')),
+                    CustomTableCell(content: Text('Cash Payment')),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    CustomTableCell(content: Text('Payment Status')),
+                    CustomTableCell(content: Text('Pending')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          FlatButton.icon(
+            onPressed: () {},
+            icon: Icon(Icons.payment),
+            color: Colors.grey[300],
+            label: Text('Add Payment'),
+          ),
+        ],
       ),
     );
   }

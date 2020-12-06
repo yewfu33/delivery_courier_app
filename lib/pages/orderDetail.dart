@@ -27,9 +27,8 @@ class PickOrderDetail extends StatelessWidget {
         controller: scrollController,
         child: Material(
           elevation: 10,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
           child: Container(
-            padding: const EdgeInsets.only(top: 10, bottom: 10),
+            padding: const EdgeInsets.only(top: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -263,7 +262,7 @@ class PickUpSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       FlatButton(
-                        color: Colors.green[300],
+                        color: Colors.grey[300],
                         onPressed: () {},
                         child: Text('Call +60 ${order.contact}'),
                       ),
@@ -362,7 +361,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FlatButton(
-                          color: Colors.green[300],
+                          color: Colors.grey[300],
                           onPressed: () {},
                           child: Text('Call +60 ${widget.dp[i].contact}'),
                         ),

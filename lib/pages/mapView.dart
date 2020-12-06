@@ -61,9 +61,9 @@ class MapView extends StatelessWidget {
             ),
             Positioned.fill(
               child: DraggableScrollableSheet(
-                maxChildSize: 0.7,
+                maxChildSize: 0.75,
                 minChildSize: 0.45,
-                initialChildSize: 0.6,
+                initialChildSize: 0.7,
                 builder: (_, scrollController) {
                   return PickOrderDetail(
                     order: order,

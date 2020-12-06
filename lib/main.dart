@@ -126,7 +126,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pickup order'),
+        title: Text('Pickup Order'),
         actions: <Widget>[
           Switch(
             value: true,
@@ -158,7 +158,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Icon(Icons.filter_list)
+                    const Icon(Icons.format_line_spacing)
                   ],
                 ),
               ),

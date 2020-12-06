@@ -59,11 +59,9 @@ class PickOrderList extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(bottom: 10),
                 child: Text(
-                  'Drop points: ${orderModel.dropPoint.length}',
+                  'Drop point: ${orderModel.dropPoint.length}',
                   // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
-                  style: TextStyle(
-                    fontSize: 14.5,
-                  ),
+                  style: TextStyle(fontSize: 14.5),
                 ),
               ),
               Row(
@@ -82,13 +80,8 @@ class PickOrderList extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Expanded(
-                    child: SizedBox.shrink(),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 15,
-                  ),
+                  const Spacer(),
+                  const Icon(Icons.arrow_forward_ios, size: 15),
                 ],
               ),
             ],
