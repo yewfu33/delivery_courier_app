@@ -1,6 +1,6 @@
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/pages/orderDetail.dart';
-import 'package:delivery_courier_app/viewModel/orderDetailViewModel.dart';
+import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,8 +23,8 @@ class MapView extends StatelessWidget {
         ],
       ),
       //   floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-      body: ChangeNotifierProvider(
-        create: (_) => OrderDetailViewModel.initRoute(
+      body: ChangeNotifierProvider.value(
+        value: MapProvider.init(
           LatLng(order.latitude, order.longitude),
           order.dropPoint
               .map((dp) => LatLng(dp.latitude, dp.longitude))
@@ -32,49 +32,50 @@ class MapView extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Consumer<OrderDetailViewModel>(builder: (context, model, _) {
-              return Positioned.fill(
-                bottom: MediaQuery.of(context).size.height * 0.4,
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  myLocationEnabled: true,
-                  compassEnabled: true,
-                  rotateGesturesEnabled: true,
-                  markers: Set<Marker>.of(model.markers.values),
-                  polylines: Set<Polyline>.of(model.polylines.values),
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(order.latitude, order.longitude),
-                    zoom: 15,
+            Consumer<MapProvider>(
+              builder: (context, map, _) {
+                return Positioned.fill(
+                  bottom: MediaQuery.of(context).size.height * 0.4,
+                  child: GoogleMap(
+                    mapType: MapType.normal,
+                    myLocationEnabled: true,
+                    compassEnabled: true,
+                    rotateGesturesEnabled: true,
+                    markers: map.markers,
+                    polylines: map.poly,
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(order.latitude, order.longitude),
+                      zoom: 15,
+                    ),
+                    onMapCreated: (controller) {
+                      map.onMapCreate(controller);
+                      // animate camera focus center
+                      map.moveCameraBounds(
+                        LatLng(order.latitude, order.longitude),
+                        LatLng(order.dropPoint[0].latitude,
+                            order.dropPoint[0].longitude),
+                      );
+                    },
                   ),
-                  onMapCreated: (GoogleMapController controller) {
-                    if (model.controller.isCompleted) return;
-                    model.controller.complete(controller);
-                  },
-                ),
-              );
-            }),
+                );
+              },
+            ),
             Positioned.fill(
               child: DraggableScrollableSheet(
                 maxChildSize: 0.7,
                 minChildSize: 0.45,
                 initialChildSize: 0.6,
-                builder: (context, scrollController) {
+                builder: (_, scrollController) {
                   return PickOrderDetail(
-                      order: order, scrollController: scrollController);
+                    order: order,
+                    scrollController: scrollController,
+                  );
                 },
               ),
             ),
           ],
         ),
       ),
-      //   floatingActionButton: FloatingActionButton.extended(
-      //     onPressed: () {},
-      //     label: Text('TAKE ORDER'),
-      //     elevation: 0,
-      //     shape: RoundedRectangleBorder(
-      //         borderRadius: BorderRadius.all(Radius.circular(2))),
-      //     icon: FaIcon(FontAwesomeIcons.stackOverflow),
-      //   ),
     );
   }
 }

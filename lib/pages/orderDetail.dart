@@ -1,8 +1,8 @@
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/dropPointModel.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:delivery_courier_app/styleScheme.dart';
-import 'package:delivery_courier_app/viewModel/orderDetailViewModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -21,131 +21,121 @@ class PickOrderDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    OrderModel o = order;
     return ScrollConfiguration(
       behavior: MyScrollBehavior(),
       child: SingleChildScrollView(
         controller: scrollController,
         child: Material(
           elevation: 10,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
           child: Container(
+            padding: const EdgeInsets.only(top: 10, bottom: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  padding: const EdgeInsets.only(bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 10),
+                      // ActionButton
+                      // Align(
+                      //   alignment: Alignment.topCenter,
+                      //   child: Text(
+                      //     "Order #${order.orderId}",
+                      //     style:
+                      //         TextStyle(fontSize: 14, color: Colors.grey),
+                      //   ),
+                      // ),
+                      const Divider(color: Colors.transparent, height: 5),
+                      ActionButton(),
+                      const Divider(color: Colors.transparent),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            // ActionButton
-                            // Align(
-                            //   alignment: Alignment.topCenter,
-                            //   child: Text(
-                            //     "Order #${order.orderId}",
-                            //     style:
-                            //         TextStyle(fontSize: 14, color: Colors.grey),
-                            //   ),
-                            // ),
-                            const Divider(color: Colors.transparent, height: 5),
-                            ActionButton(),
-                            const Divider(color: Colors.transparent),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 14.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    'RM 30',
-                                    style: TextStyle(
-                                      color: Constant.primaryColor,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    "Today at ${DateFormat('h:mm a').format(o.dateTime)}",
-                                    // 'Today at 11.42 pm',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    o.name,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.3,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
+                            Text(
+                              'RM 30',
+                              style: TextStyle(
+                                color: Constant.primaryColor,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 14.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  if (o.vehicleType == 0)
-                                    FaIcon(
-                                      FontAwesomeIcons.motorcycle,
-                                      color: Constant.primaryColor,
-                                    ),
-                                  if (o.vehicleType == 1)
-                                    FaIcon(
-                                      FontAwesomeIcons.car,
-                                      color: Constant.primaryColor,
-                                    ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'By ${setVehicleType(o.vehicleType)}',
-                                    style: TextStyle(
-                                      color: Constant.primaryColor,
-                                      fontSize: 15.5,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(height: 6),
+                            Text(
+                              "Today at ${DateFormat('h:mm a').format(order.dateTime)}",
+                              // 'Today at 11.42 pm',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              order.name,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.3,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            if (order.vehicleType == 0)
+                              FaIcon(
+                                FontAwesomeIcons.motorcycle,
+                                color: Constant.primaryColor,
+                              ),
+                            if (order.vehicleType == 1)
+                              FaIcon(
+                                FontAwesomeIcons.car,
+                                color: Constant.primaryColor,
+                              ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'By ${setVehicleType(order.vehicleType)}',
+                              style: const TextStyle(
+                                color: Constant.primaryColor,
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: Divider(color: Colors.black),
-                      ),
-                      UserInfoSection(),
-                      const Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: const Divider(color: Colors.black),
-                      ),
-                      //pickup location
-                      PickUpSection(order: o),
-                      const Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: const Divider(color: Colors.black),
-                      ),
-                      //drop off location
-                      DropOffLocationSection(dp: o.dropPoint),
-                      // ActionButtonSection(),
                     ],
                   ),
                 ),
+                const Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: Divider(color: Colors.black),
+                ),
+                UserInfoSection(),
+                const Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: const Divider(color: Colors.black),
+                ),
+                //pickup location
+                PickUpSection(order: order),
+                const Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: const Divider(color: Colors.black),
+                ),
+                //drop off location
+                DropOffLocationSection(dp: order.dropPoint),
+                // ActionButtonSection(),
               ],
             ),
           ),
@@ -160,7 +150,7 @@ class UserInfoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Container(
-        child: CircleAvatar(
+        child: const CircleAvatar(
           radius: 20,
           child: Icon(
             Icons.person,
@@ -168,12 +158,14 @@ class UserInfoSection extends StatelessWidget {
           ),
         ),
       ),
-      title: Text("john doe",
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          )),
+      title: Text(
+        "john doe",
+        style: const TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
       trailing: Container(
         child: CircleAvatar(
           backgroundColor: Colors.green[400],
@@ -220,11 +212,10 @@ class PickUpSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    OrderDetailViewModel model =
-        Provider.of<OrderDetailViewModel>(context, listen: false);
+    MapProvider model = Provider.of<MapProvider>(context, listen: false);
 
     return Container(
-      padding: const EdgeInsets.only(top: 10, bottom: 0),
+      padding: const EdgeInsets.only(top: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -241,7 +232,7 @@ class PickUpSection extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Stepper(
             physics: NeverScrollableScrollPhysics(),
             controlsBuilder: (BuildContext context,
@@ -261,10 +252,7 @@ class PickUpSection extends StatelessWidget {
                     order.address,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
-                    style: TextStyle(
-                      height: 1.3,
-                      letterSpacing: 0.3,
-                    ),
+                    style: const TextStyle(height: 1.3, letterSpacing: 0.3),
                   ),
                 ),
                 subtitle: Text(
@@ -279,7 +267,7 @@ class PickUpSection extends StatelessWidget {
                         onPressed: () {},
                         child: Text('Call +60 ${order.contact}'),
                       ),
-                      SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       (order.comment.isNotEmpty)
                           ? Text(order.comment)
                           : SizedBox.shrink(),
@@ -287,11 +275,11 @@ class PickUpSection extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 6.0),
                         child: Row(
                           children: <Widget>[
-                            FaIcon(
+                            const FaIcon(
                               FontAwesomeIcons.wallet,
                             ),
-                            SizedBox(width: 6),
-                            Text('Payment at this address'),
+                            const SizedBox(width: 6),
+                            const Text('Payment at this address'),
                           ],
                         ),
                       ),
@@ -321,8 +309,8 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
 
   @override
   Widget build(BuildContext context) {
-    OrderDetailViewModel model =
-        Provider.of<OrderDetailViewModel>(context, listen: false);
+    MapProvider model = Provider.of<MapProvider>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.only(top: 10, bottom: 14),
       child: Column(
@@ -341,10 +329,10 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Stepper(
             physics: NeverScrollableScrollPhysics(),
-            controlsBuilder: (BuildContext context,
+            controlsBuilder: (_,
                     {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
                 Container(),
             currentStep: _step,
@@ -362,10 +350,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
                       widget.dp[i].address,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
-                      style: TextStyle(
-                        height: 1.3,
-                        letterSpacing: 0.3,
-                      ),
+                      style: const TextStyle(height: 1.3, letterSpacing: 0.3),
                     ),
                   ),
                   subtitle: Text(DateFormat('dd MMM yyyy h:mm a')
@@ -381,7 +366,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
                           onPressed: () {},
                           child: Text('Call +60 ${widget.dp[i].contact}'),
                         ),
-                        SizedBox(height: 3),
+                        const SizedBox(height: 3),
                         (widget.dp[i].comment.isNotEmpty)
                             ? Text(widget.dp[i].comment)
                             : SizedBox.shrink(),
