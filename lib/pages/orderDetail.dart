@@ -1,7 +1,10 @@
+import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/dropPointModel.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/pages/onTaskPage.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
+import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:delivery_courier_app/styleScheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +50,7 @@ class PickOrderDetail extends StatelessWidget {
                       //   ),
                       // ),
                       const Divider(color: Colors.transparent, height: 5),
-                      ActionButton(),
+                      ActionButton(order: order),
                       const Divider(color: Colors.transparent),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14.0),
@@ -180,18 +183,77 @@ class UserInfoSection extends StatelessWidget {
   }
 }
 
-class ActionButton extends StatelessWidget {
-  const ActionButton({
-    Key key,
-  }) : super(key: key);
+class ActionButton extends StatefulWidget {
+  final OrderModel order;
+  const ActionButton({Key key, this.order}) : super(key: key);
+
+  @override
+  _ActionButtonState createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<ActionButton> {
+  Future<bool> openConfimationDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Constant.primaryColor,
+          ),
+        ),
+        child: AlertDialog(
+          title: Text("Confirmation"),
+          content: Text("Take the order?"),
+          actions: [
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(_, false);
+              },
+              child: Text('CANCEL'),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(_, true);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
       child: RaisedButton(
-        onPressed: () {},
+        onPressed: () async {
+          var confirmation = await openConfimationDialog(context);
+          if (confirmation) {
+            changeScreenReplacement(
+              context,
+              ChangeNotifierProvider(
+                create: (_) => TaskProvider(
+                  markers: model.markers,
+                  destination: model.destination,
+                  origin: model.origin,
+                  poly: model.poly,
+                ),
+                builder: (_, __) {
+                  return OnTaskPage(
+                    order: widget.order,
+                    snackBarMessage: "Successfully registered task",
+                  );
+                },
+              ),
+            );
+          }
+        },
         color: Constant.primaryColor,
         child: Text(
           'TAKE ORDER',
@@ -211,7 +273,7 @@ class PickUpSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MapProvider model = Provider.of<MapProvider>(context, listen: false);
+    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.only(top: 10),
@@ -239,7 +301,6 @@ class PickUpSection extends StatelessWidget {
                 Container(),
             currentStep: 0,
             onStepTapped: (index) {
-              print(index.toString());
               model.onTapPickUpLocation();
             },
             steps: [
@@ -308,7 +369,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
 
   @override
   Widget build(BuildContext context) {
-    MapProvider model = Provider.of<MapProvider>(context, listen: false);
+    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.only(top: 10, bottom: 14),

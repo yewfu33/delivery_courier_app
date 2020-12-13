@@ -173,7 +173,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Padding(
-                            padding: const EdgeInsets.only(top: 20),
+                            padding: const EdgeInsets.symmetric(vertical: 20),
                             child: Center(
                               child: CircularProgressIndicator(
                                 valueColor: new AlwaysStoppedAnimation<Color>(
@@ -182,6 +182,13 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                             ),
                           );
                         } else {
+                          if (snapshot.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(30),
+                              child: Text(snapshot.error.toString()),
+                            );
+                          }
+
                           if (!snapshot.hasData || snapshot.data.length == 0)
                             return Padding(
                                 padding: const EdgeInsets.all(30),

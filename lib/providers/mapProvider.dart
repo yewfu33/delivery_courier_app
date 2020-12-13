@@ -19,6 +19,7 @@ class MapProvider with ChangeNotifier {
   Set<Polyline> _poly = {};
   RouteModel _routeModel;
   List<LatLng> _polylineCoordinates = List();
+  List<RouteModel> _routeModelCollection = List();
 
   Set<Marker> get markers => _markers;
   Set<Polyline> get poly => _poly;
@@ -85,6 +86,8 @@ class MapProvider with ChangeNotifier {
         await mapService.getRouteByCoordinates(origin, destination[0]);
 
     _routeModel = route;
+    // append on the collection
+    _routeModelCollection.add(route);
 
     // reset poly
     _poly = {};
@@ -99,6 +102,9 @@ class MapProvider with ChangeNotifier {
         if (i % 2 != 0) {
           RouteModel r = await mapService.getRouteByCoordinates(
               destination[i - 1], destination[i]);
+
+          // append on the collection
+          _routeModelCollection.add(r);
 
           // merge the coordinates to the list
           _polylineCoordinates

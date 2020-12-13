@@ -19,15 +19,17 @@ class AppProvider extends ChangeNotifier {
   AppProvider.user({@required this.user});
 
   Stream<List<OrderModel>> ordersStream() async* {
-    var res = await getAllOrders();
+    try {
+      var res = await getAllOrders();
 
-    if (res == null) throw Exception('failed to fetch pick order');
-    print(res.statusCode.toString());
-
-    if (res.statusCode == 200) {
-      yield _setOrderModel(res.body);
-    } else {
-      print(res.body);
+      if (res.statusCode == 200) {
+        yield _setOrderModel(res.body);
+      } else {
+        print(res.body);
+        yield null;
+      }
+    } catch (e) {
+      print(e);
       yield null;
     }
   }
@@ -43,9 +45,9 @@ class AppProvider extends ChangeNotifier {
       print(
           "socket exception in \"${Constant.serverName + Constant.orderPath}\", " +
               e.toString());
-      return null;
+      throw Exception('failed to fetch pick order');
     } catch (e) {
-      return null;
+      throw Exception('failed to fetch pick order');
     }
   }
 

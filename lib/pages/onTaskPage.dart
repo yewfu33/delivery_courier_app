@@ -1,14 +1,56 @@
 import 'package:delivery_courier_app/constant.dart';
+import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
+import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
-class OnTaskPage extends StatelessWidget {
+import '../main.dart';
+
+class OnTaskPage extends StatefulWidget {
+  final OrderModel order;
+  final String snackBarMessage;
+
+  const OnTaskPage({
+    Key key,
+    @required this.order,
+    this.snackBarMessage = "",
+  }) : super(key: key);
+
+  @override
+  _OnTaskPageState createState() => _OnTaskPageState();
+}
+
+class _OnTaskPageState extends State<OnTaskPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.snackBarMessage.isNotEmpty) {
+        scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(widget.snackBarMessage),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
-        title: Text("Order #123"),
+        title: Text("Order #${widget.order.orderId}"),
+        leading: BackButton(
+          onPressed: () {
+            changeScreenReplacement(context, MyHomePage());
+          },
+        ),
         actions: [
           IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
         ],
@@ -17,7 +59,7 @@ class OnTaskPage extends StatelessWidget {
         children: [
           Positioned.fill(
             bottom: MediaQuery.of(context).size.height * 0.4,
-            child: BackPanel(),
+            child: BackPanel(order: widget.order),
           ),
           Positioned.fill(
             child: DraggableScrollableSheet(
@@ -36,23 +78,32 @@ class OnTaskPage extends StatelessWidget {
 }
 
 class BackPanel extends StatelessWidget {
-  final GoogleMapController controller;
+  final OrderModel order;
 
-  const BackPanel({
-    Key key,
-    this.controller,
-  }) : super(key: key);
+  const BackPanel({Key key, @required this.order}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final map = Provider.of<TaskProvider>(context);
+
     return GoogleMap(
       mapType: MapType.normal,
+      myLocationEnabled: true,
+      rotateGesturesEnabled: true,
+      markers: map.markers,
+      polylines: map.poly,
       initialCameraPosition: CameraPosition(
-        target: LatLng(37.42796133580664, -122.085749655962),
+        target: LatLng(order.latitude, order.longitude),
         zoom: 14.4746,
       ),
-      onMapCreated: (GoogleMapController controller) {
-        controller = controller;
+      onMapCreated: (GoogleMapController controller) async {
+        await map.onMapCreate(controller);
+
+        // center the view
+        map.moveCameraBounds(
+          LatLng(order.latitude, order.longitude),
+          LatLng(order.dropPoint[0].latitude, order.dropPoint[0].longitude),
+        );
       },
     );
   }

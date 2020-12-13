@@ -102,14 +102,6 @@ class MyDrawer extends StatelessWidget {
             ),
             ListTile(
               title: FlatButton(
-                onPressed: () {
-                  changeScreen(context, OnTaskPage());
-                },
-                child: Text('ontaskpage'),
-              ),
-            ),
-            ListTile(
-              title: FlatButton(
                 onPressed: () async {
                   await Provider.of<UserProvider>(context, listen: false)
                       .signOut();

@@ -17,85 +17,82 @@ class PickOrderList extends StatelessWidget {
         Navigator.pushNamed(context, '/details', arguments: orderModel);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 11),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 11),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    'RM 30',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Constant.primaryColor,
-                      letterSpacing: 0.4,
-                      fontWeight: FontWeight.w500,
-                    ),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
+        margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 11),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Icon(Icons.access_time),
+                const SizedBox(width: 7),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 1.5, horizontal: 4),
+                  child: Text(
+                    '11:42 PM',
+                    // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w500),
                   ),
-                  Text(
-                    'Order #${orderModel.orderId}',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13.5,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
-                child: Text(
-                  'Arrive at 11.42 pm',
-                  // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
-                  style: TextStyle(
-                    fontSize: 14.5,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Drop point: ${orderModel.dropPoint.length}',
-                  // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
-                  style: TextStyle(fontSize: 14.5),
+                const Spacer(),
+                Text(
+                  '#${orderModel.orderId}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 13.5),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 9, bottom: 9),
+              child: Text(
+                'RM 30',
+                style: const TextStyle(
+                  fontSize: 16.5,
+                  color: Constant.primaryColor,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Row(
-                children: <Widget>[
-                  if (orderModel.vehicleType == 0)
-                    FaIcon(
-                      FontAwesomeIcons.motorcycle,
-                    ),
-                  if (orderModel.vehicleType == 1)
-                    FaIcon(
-                      FontAwesomeIcons.car,
-                    ),
-                  SizedBox(width: 10),
-                  Text(
-                    'By ${setVehicleType(orderModel.vehicleType)}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-                  const Icon(Icons.arrow_forward_ios, size: 15),
-                ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: Text(
+                'Addresses: ${orderModel.dropPoint.length}',
+                // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
+                style: const TextStyle(fontSize: 14.5),
               ),
-            ],
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 3,
-                offset: Offset(0, 2), // changes position of shadow
-              ),
-            ],
-          ),
+            ),
+            Row(
+              children: <Widget>[
+                if (orderModel.vehicleType == 0)
+                  FaIcon(FontAwesomeIcons.motorcycle, size: 18.5),
+                if (orderModel.vehicleType == 1)
+                  FaIcon(FontAwesomeIcons.car, size: 18.5),
+                const SizedBox(width: 6),
+                Text(
+                  'By ${setVehicleType(orderModel.vehicleType)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ],
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 3,
+              offset: Offset(0, 2), // changes position of shadow
+            ),
+          ],
         ),
       ),
     );
