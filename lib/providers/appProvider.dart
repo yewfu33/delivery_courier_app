@@ -38,6 +38,10 @@ class AppProvider extends ChangeNotifier {
     try {
       var res = await http.get(
         Constant.serverName + Constant.orderPath,
+        headers: {
+          'Content-type': 'application/json',
+          'Authorization': 'Bearer ${user.token}',
+        },
       );
 
       return res;
@@ -52,8 +56,8 @@ class AppProvider extends ChangeNotifier {
   }
 
   List<OrderModel> _setOrderModel(String jsonBody) {
-    List<dynamic> body = json.decode(jsonBody);
-    return body.map((e) => OrderModel.fromJson(e)).toList();
+    var body = json.decode(jsonBody);
+    return body.map<OrderModel>((e) => OrderModel.fromJson(e)).toList();
   }
 
   Future<List<OrderModel>> fetchOrders() async {
@@ -91,7 +95,7 @@ class AppProvider extends ChangeNotifier {
           actions: [
             FlatButton(
               onPressed: () {
-                popScreen(context);
+                popScreen(_);
               },
               child: Text('OK'),
             )
@@ -123,9 +127,9 @@ class AppProvider extends ChangeNotifier {
               FlatButton(
                 onPressed: () {
                   if (isPop) {
-                    Navigator.of(context).pop();
+                    Navigator.of(_).pop();
                   } else {
-                    Navigator.of(context)
+                    Navigator.of(_)
                         .pushNamedAndRemoveUntil('/', (route) => false);
                   }
                 },
