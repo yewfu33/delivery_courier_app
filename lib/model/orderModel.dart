@@ -1,6 +1,8 @@
 import 'package:delivery_courier_app/model/dropPointModel.dart';
 import 'package:delivery_courier_app/model/userModel.dart';
 
+import 'enum.dart';
+
 class OrderModel {
   final int orderId;
   final String name;
@@ -13,7 +15,7 @@ class OrderModel {
   final DateTime dateTime;
   final double price;
   final int vehicleType;
-  final int status;
+  final DeliveryStatus status;
   final int userId;
   final DateTime createdAt;
   final List<DropPointModel> dropPoint;
@@ -30,8 +32,8 @@ class OrderModel {
         contact = json['contact_num'],
         dateTime = DateTime.parse(json['pick_up_datetime']),
         price = json['price'],
-        status = json['delivery_status_id'],
-        vehicleType = json['vehicle_type_id'],
+        status = DeliveryStatus.values[json['delivery_status']],
+        vehicleType = json['vehicle_type'],
         createdAt = DateTime.parse(json['created_at']),
         userId = json['user_id'],
         user = UserModel.fromJson(json['user']),
@@ -55,8 +57,8 @@ class OrderModel {
       'contact_num': contact,
       'pick_up_datetime': dateTime,
       'price': price,
-      'delivery_status_id': status,
-      'vehicle_type_id': vehicleType,
+      'delivery_status': status.index,
+      'vehicle_type': vehicleType,
       'user_id': userId,
       'created_at': createdAt,
       'drop_points': dp,

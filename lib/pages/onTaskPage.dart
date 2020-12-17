@@ -1,11 +1,13 @@
 import 'package:delivery_courier_app/constant.dart';
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
+import 'package:delivery_courier_app/model/enum.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
 
@@ -67,7 +69,10 @@ class _OnTaskPageState extends State<OnTaskPage> {
               minChildSize: 0.45,
               initialChildSize: 0.7,
               builder: (context, scrollController) {
-                return Panel(scrollController: scrollController);
+                return Panel(
+                  scrollController: scrollController,
+                  order: widget.order,
+                );
               },
             ),
           ),
@@ -110,15 +115,19 @@ class BackPanel extends StatelessWidget {
 }
 
 class Panel extends StatelessWidget {
+  final OrderModel order;
   final ScrollController scrollController;
 
   const Panel({
     Key key,
     @required this.scrollController,
+    @required this.order,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final p = Provider.of<TaskProvider>(context);
+
     return ScrollConfiguration(
       behavior: MyScrollBehavior(),
       child: SingleChildScrollView(
@@ -127,25 +136,12 @@ class Panel extends StatelessWidget {
           elevation: 10,
           child: Column(
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                width: double.infinity,
-                child: RaisedButton(
-                  onPressed: () {},
-                  color: Constant.primaryColor,
-                  child: Text(
-                    'Mark Arrived Pickup',
-                    // Start Delivery Task
-                    // Mark Arrived DropPoint
-                    // Complete task
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
+              UpdateStatusButton(
+                status: p.status,
+                orderId: order.orderId,
+                currentDropPointIndex: p.dropPointIndex,
+                dpLength: p.dpLength,
+                userFcmToken: order.user.fcmToken,
               ),
               Container(
                 padding:
@@ -172,7 +168,7 @@ class Panel extends StatelessWidget {
                       const Icon(Icons.access_time),
                       const SizedBox(width: 8),
                       Text(
-                        '3.50 PM - Pick-Up',
+                        p.clock,
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -183,8 +179,13 @@ class Panel extends StatelessWidget {
                   ),
                 ),
               ),
-              UserInfoSection(),
-              SignaturesSection(),
+              UserInfoSection(
+                name: order.user.name,
+                address: p.currentAddress,
+                phoneNum: p.currentTel,
+                remark: p.currentRemark,
+              ),
+              //   SignaturesSection(),
               PaymentSection(),
             ],
           ),
@@ -194,10 +195,129 @@ class Panel extends StatelessWidget {
   }
 }
 
+class UpdateStatusButton extends StatelessWidget {
+  final DeliveryStatus status;
+  final int orderId;
+  final int currentDropPointIndex;
+  final int dpLength;
+  final String userFcmToken;
+
+  UpdateStatusButton({
+    Key key,
+    @required this.status,
+    @required this.orderId,
+    @required this.currentDropPointIndex,
+    @required this.dpLength,
+    @required this.userFcmToken,
+  }) : super(key: key);
+
+  final style = TextStyle(
+    color: Colors.white,
+    fontSize: 16,
+    letterSpacing: 1,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final task = Provider.of<TaskProvider>(context, listen: false);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      width: double.infinity,
+      child: Builder(
+        builder: (_) {
+          switch (status) {
+            case DeliveryStatus.MarkArrivedPickUp:
+              return RaisedButton(
+                onPressed: () {
+                  task.showConfirmationDialog(
+                    _,
+                    "Mark arrived pick up?",
+                    () => task.invokeSendNotifications(
+                      "Courier have arrived your pick up",
+                      userFcmToken,
+                      toUpdateStatus: DeliveryStatus.StartDeliveryTask,
+                    ),
+                  );
+                },
+                color: Constant.primaryColor,
+                child: Text('Mark Arrived Pickup', style: style),
+              );
+              break;
+            case DeliveryStatus.StartDeliveryTask:
+              return RaisedButton(
+                onPressed: () {
+                  task.showConfirmationDialog(_, "Start the delivery task?",
+                      () => task.updateDeliveryStatus(orderId, 1));
+                },
+                color: Constant.primaryColor,
+                child: Text('Start Delivery Task', style: style),
+              );
+              break;
+            case DeliveryStatus.MarkArrivedDropPoint:
+              return RaisedButton(
+                onPressed: () {
+                  task.showConfirmationDialog(_, "Mark arrived a drop point?",
+                      () {
+                    if (currentDropPointIndex + 1 >= dpLength) {
+                      return task.invokeSendNotifications(
+                        "Courier have arrived a drop point",
+                        userFcmToken,
+                        toUpdateStatus: DeliveryStatus.CompleteDelivery,
+                      );
+                    } else {
+                      // indicate move on to next dp
+                      task.notifyNextDropPoint();
+
+                      return task.invokeSendNotifications(
+                        "Courier have arrived a drop point",
+                        userFcmToken,
+                      );
+                    }
+                  });
+                },
+                color: Constant.primaryColor,
+                child: Text('Mark Arrived DropPoint', style: style),
+              );
+              break;
+            case DeliveryStatus.CompleteDelivery:
+              return RaisedButton(
+                onPressed: () =>
+                    task.updateDeliveryStatus(orderId, 2, context: _),
+                color: Constant.primaryColor,
+                child: Text('Mark Complete Delivery', style: style),
+              );
+              break;
+            default:
+              return Text("error.");
+          }
+        },
+      ),
+    );
+  }
+}
+
 class UserInfoSection extends StatelessWidget {
+  final String name;
+  final String phoneNum;
+  final String address;
+  final String remark;
+
   const UserInfoSection({
     Key key,
+    @required this.name,
+    @required this.phoneNum,
+    @required this.address,
+    @required this.remark,
   }) : super(key: key);
+
+  Future<void> _makePhoneCall(String tel) async {
+    if (await canLaunch(tel)) {
+      await launch(tel);
+    } else {
+      print('Could not call $tel');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +333,7 @@ class UserInfoSection extends StatelessWidget {
               children: [
                 const Icon(Icons.person),
                 const SizedBox(width: 10),
-                Text('David Smith'),
+                Text(name),
               ],
             ),
           ),
@@ -225,7 +345,7 @@ class UserInfoSection extends StatelessWidget {
               children: [
                 const Icon(Icons.phone),
                 const SizedBox(width: 10),
-                Text('+60167970741'),
+                Text('+60$phoneNum'),
               ],
             ),
           ),
@@ -240,22 +360,12 @@ class UserInfoSection extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    '5.13 & 5.14 5th Floor Wisma Central Jalan Ampang',
+                    address,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 3,
                     softWrap: true,
                   ),
                 ),
-                // Container(
-                //   decoration: BoxDecoration(
-                //     shape: BoxShape.circle,
-                //     color: Colors.grey[300],
-                //   ),
-                //   child: IconButton(
-                //     icon: Icon(Icons.near_me),
-                //     onPressed: () {},
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -269,7 +379,7 @@ class UserInfoSection extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec feugiat elementum eros sed tincidunt. Praesent consequat consectetur justo, in elementum justo porta sed.',
+                    (remark.isEmpty) ? "-" : remark,
                     softWrap: true,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
@@ -283,7 +393,9 @@ class UserInfoSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: FlatButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      _makePhoneCall('tel:+60$phoneNum');
+                    },
                     icon: const Icon(Icons.call),
                     color: Colors.grey[300],
                     label: Text('Call'),

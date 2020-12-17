@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:delivery_courier_app/constant.dart';
 import 'package:delivery_courier_app/model/routeModel.dart';
+import 'package:delivery_courier_app/model/user.dart';
+import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/services/mapService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:http/http.dart' as http;
 
 class MapProvider with ChangeNotifier {
   final MapService mapService = MapService();
@@ -126,6 +132,42 @@ class MapProvider with ChangeNotifier {
           onTap: () {},
           points: points),
     );
+  }
+
+  Future<bool> registerOrder(
+      BuildContext context, int orderId, User courier) async {
+    try {
+      var res = await http.post(
+        Constant.serverName +
+            Constant.orderPath +
+            '/take/' +
+            orderId.toString() +
+            '?courier_id=${courier.id}',
+        headers: {
+          'Authorization': 'Bearer ${courier.token}',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        return true;
+      } else {
+        var body = json.decode(res.body);
+
+        if (body["message"] != null) {
+          AppProvider.openCustomDialog(
+              context, "Error", body["message"], false);
+        } else {
+          AppProvider.showRetryDialog(context, message: res.reasonPhrase);
+        }
+
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      // show retry dialog
+      AppProvider.showRetryDialog(context);
+      return false;
+    }
   }
 
   void onTapPickUpLocation() {

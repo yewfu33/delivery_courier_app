@@ -1,7 +1,7 @@
 enum VehicleType { Bike, Car, Lorry }
 
 enum DeliveryStatus {
-  ArrivedPickUp,
+  MarkArrivedPickUp,
   StartDeliveryTask,
   MarkArrivedDropPoint,
   CompleteDelivery

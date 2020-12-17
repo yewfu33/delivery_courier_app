@@ -14,7 +14,8 @@ class PickOrderList extends StatelessWidget {
     return InkWell(
       onTap: () {
         // push to detail page
-        Navigator.pushNamed(context, '/details', arguments: orderModel);
+        Navigator.pushNamed(context, '/details',
+            arguments: [orderModel, context]);
       },
       child: Container(
         width: double.infinity,

@@ -10,7 +10,9 @@ import 'package:provider/provider.dart';
 class MapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final OrderModel order = ModalRoute.of(context).settings.arguments;
+    final List arguments = ModalRoute.of(context).settings.arguments;
+    final OrderModel order = arguments[0];
+    final BuildContext appProviderContext = arguments[1];
 
     return new Scaffold(
       appBar: AppBar(
@@ -68,6 +70,7 @@ class MapView extends StatelessWidget {
                   return PickOrderDetail(
                     order: order,
                     scrollController: scrollController,
+                    appProviderContext: appProviderContext,
                   );
                 },
               ),

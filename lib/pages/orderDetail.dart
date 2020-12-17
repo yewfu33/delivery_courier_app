@@ -2,7 +2,9 @@ import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/dropPointModel.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/model/userModel.dart';
 import 'package:delivery_courier_app/pages/onTaskPage.dart';
+import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:delivery_courier_app/styleScheme.dart';
@@ -17,10 +19,14 @@ import '../constant.dart';
 class PickOrderDetail extends StatelessWidget {
   final OrderModel order;
   final ScrollController scrollController;
+  final BuildContext appProviderContext;
 
-  const PickOrderDetail(
-      {Key key, @required this.order, @required this.scrollController})
-      : super(key: key);
+  const PickOrderDetail({
+    Key key,
+    @required this.order,
+    @required this.scrollController,
+    @required this.appProviderContext,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +56,10 @@ class PickOrderDetail extends StatelessWidget {
                       //   ),
                       // ),
                       const Divider(color: Colors.transparent, height: 5),
-                      ActionButton(order: order),
+                      ActionButton(
+                        order: order,
+                        appProviderContext: appProviderContext,
+                      ),
                       const Divider(color: Colors.transparent),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14.0),
@@ -124,7 +133,7 @@ class PickOrderDetail extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14.0),
                   child: Divider(color: Colors.black),
                 ),
-                UserInfoSection(),
+                UserInfoSection(user: order.user),
                 const Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14.0),
                   child: const Divider(color: Colors.black),
@@ -148,6 +157,13 @@ class PickOrderDetail extends StatelessWidget {
 }
 
 class UserInfoSection extends StatelessWidget {
+  final UserModel user;
+
+  const UserInfoSection({
+    Key key,
+    @required this.user,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -161,7 +177,7 @@ class UserInfoSection extends StatelessWidget {
         ),
       ),
       title: Text(
-        "john doe",
+        user.name,
         style: const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.bold,
@@ -185,7 +201,12 @@ class UserInfoSection extends StatelessWidget {
 
 class ActionButton extends StatefulWidget {
   final OrderModel order;
-  const ActionButton({Key key, this.order}) : super(key: key);
+  final BuildContext appProviderContext;
+  const ActionButton({
+    Key key,
+    @required this.order,
+    @required this.appProviderContext,
+  }) : super(key: key);
 
   @override
   _ActionButtonState createState() => _ActionButtonState();
@@ -227,31 +248,39 @@ class _ActionButtonState extends State<ActionButton> {
   @override
   Widget build(BuildContext context) {
     final MapProvider model = Provider.of<MapProvider>(context, listen: false);
+    final AppProvider app =
+        Provider.of<AppProvider>(widget.appProviderContext, listen: false);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
       child: RaisedButton(
         onPressed: () async {
-          var confirmation = await openConfimationDialog(context);
-          if (confirmation) {
-            changeScreenReplacement(
-              context,
-              ChangeNotifierProvider(
-                create: (_) => TaskProvider(
-                  markers: model.markers,
-                  destination: model.destination,
-                  origin: model.origin,
-                  poly: model.poly,
+          //var confirmation = await openConfimationDialog(context);
+          if (true) {
+            // var isSuccessRegistered = await model.registerOrder(
+            //     context, widget.order.orderId, app.user);
+
+            if (true) {
+              changeScreenReplacement(
+                context,
+                ChangeNotifierProvider(
+                  create: (_) => TaskProvider(
+                      markers: model.markers,
+                      destination: model.destination,
+                      origin: model.origin,
+                      poly: model.poly,
+                      user: app.user,
+                      order: widget.order),
+                  builder: (_, __) {
+                    return OnTaskPage(
+                      order: widget.order,
+                      snackBarMessage: "Successfully registered task",
+                    );
+                  },
                 ),
-                builder: (_, __) {
-                  return OnTaskPage(
-                    order: widget.order,
-                    snackBarMessage: "Successfully registered task",
-                  );
-                },
-              ),
-            );
+              );
+            }
           }
         },
         color: Constant.primaryColor,
