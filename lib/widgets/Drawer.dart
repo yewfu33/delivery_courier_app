@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/user.dart';
-import 'package:delivery_courier_app/pages/onTaskPage.dart';
+import 'package:delivery_courier_app/pages/myTaskPage.dart';
 import 'package:delivery_courier_app/pages/settingsPage.dart';
 import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/userProvider.dart';
@@ -10,6 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../constant.dart';
+import '../main.dart';
 
 class MyDrawer extends StatelessWidget {
   @override
@@ -74,13 +75,19 @@ class MyDrawer extends StatelessWidget {
               color: Colors.grey[200],
             ),
             DrawerListTile(
-              onTap: null,
+              onTap: () => changeScreenReplacement(context, MyHomePage()),
               text: "Pick-up",
               leading: FaIcon(FontAwesomeIcons.truckLoading),
             ),
             DrawerListTile(
-              onTap: null,
-              text: "Records",
+              onTap: () => changeScreen(
+                context,
+                Provider<User>.value(
+                  value: user,
+                  builder: (_, __) => MyTaskPage(),
+                ),
+              ),
+              text: "My Task",
               leading: FaIcon(FontAwesomeIcons.history),
             ),
             DrawerListTile(
@@ -91,11 +98,12 @@ class MyDrawer extends StatelessWidget {
             DrawerListTile(
               onTap: () {
                 changeScreen(
-                    context,
-                    Provider<User>.value(
-                      value: user,
-                      builder: (_, __) => SettingsPage(),
-                    ));
+                  context,
+                  Provider<User>.value(
+                    value: user,
+                    builder: (_, __) => SettingsPage(),
+                  ),
+                );
               },
               text: "Settings",
               leading: FaIcon(FontAwesomeIcons.slidersH),
