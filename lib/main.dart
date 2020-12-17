@@ -6,6 +6,7 @@ import 'package:delivery_courier_app/pages/mapView.dart';
 import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/userProvider.dart';
 import 'package:delivery_courier_app/route.dart';
+import 'package:delivery_courier_app/services/locationService.dart';
 import 'package:delivery_courier_app/widgets/Drawer.dart';
 import 'package:delivery_courier_app/widgets/PickOrderList.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<UserProvider>.value(
             value: UserProvider.initialize()),
+        Provider<LocationService>(
+          create: (_) => LocationService(),
+          dispose: (_, v) => v.dispose(),
+        ),
       ],
       child: MaterialApp(
         title: 'Delivery Courier App',
@@ -196,7 +201,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                                     'No orders avaiable at the moment.'));
 
                           return Column(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.max,
                             children: snapshot.data
                                 .map((o) => PickOrderList(orderModel: o))
                                 .toList(),
