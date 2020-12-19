@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:delivery_courier_app/constant.dart';
 import 'package:delivery_courier_app/model/enum.dart';
+import 'package:delivery_courier_app/model/locationModel.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
+import 'package:delivery_courier_app/services/locationService.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +19,9 @@ import 'appProvider.dart';
 
 class TaskProvider with ChangeNotifier {
   GoogleMapController _mapController;
+  final LocationService _locationService = LocationService();
+
+  StreamSubscription locationSubscription;
 
   final LatLng origin;
   final List<LatLng> destination;
@@ -96,6 +102,9 @@ class TaskProvider with ChangeNotifier {
 
           // indicate finish a dp
           dropPointIndex += 1;
+          // invoke location tracing
+          invokeTracking();
+
           _notifyUpdateStatus(DeliveryStatus.MarkArrivedDropPoint);
         } else if (s == 2) {
           AppProvider.openCustomDialog(
@@ -104,6 +113,9 @@ class TaskProvider with ChangeNotifier {
             "detailss",
             false,
           );
+
+          // close the stream
+          locationSubscription.cancel();
         }
       } else {
         print('====== fail to update status');
@@ -142,6 +154,13 @@ class TaskProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+  }
+
+  void invokeTracking() {
+    locationSubscription =
+        _locationService.locationStream.listen((LocationModel d) async {
+      await _locationService.sendLocation(d);
+    });
   }
 
   void showConfirmationDialog(
