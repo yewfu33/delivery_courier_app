@@ -1,6 +1,7 @@
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/dropPointModel.dart';
+import 'package:delivery_courier_app/model/enum.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/userModel.dart';
 import 'package:delivery_courier_app/pages/onTaskPage.dart';
@@ -46,20 +47,12 @@ class PickOrderDetail extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      // ActionButton
-                      // Align(
-                      //   alignment: Alignment.topCenter,
-                      //   child: Text(
-                      //     "Order #${order.orderId}",
-                      //     style:
-                      //         TextStyle(fontSize: 14, color: Colors.grey),
-                      //   ),
-                      // ),
                       const Divider(color: Colors.transparent, height: 5),
-                      ActionButton(
-                        order: order,
-                        appProviderContext: appProviderContext,
-                      ),
+                      if (order.status == DeliveryStatus.MarkArrivedPickUp)
+                        ActionButton(
+                          order: order,
+                          appProviderContext: appProviderContext,
+                        ),
                       const Divider(color: Colors.transparent),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14.0),
@@ -256,12 +249,12 @@ class _ActionButtonState extends State<ActionButton> {
       width: double.infinity,
       child: RaisedButton(
         onPressed: () async {
-          //var confirmation = await openConfimationDialog(context);
-          if (true) {
-            // var isSuccessRegistered = await model.registerOrder(
-            //     context, widget.order.orderId, app.user);
+          var confirmation = await openConfimationDialog(context);
+          if (confirmation ?? false) {
+            var isSuccessRegistered = await model.registerOrder(
+                context, widget.order.orderId, app.user);
 
-            if (true) {
+            if (isSuccessRegistered) {
               changeScreenReplacement(
                 context,
                 ChangeNotifierProvider(
