@@ -103,7 +103,7 @@ class TaskProvider with ChangeNotifier {
           // indicate finish a dp
           dropPointIndex += 1;
           // invoke location tracing
-          invokeTracking();
+          invokeTracking(order.user.userId);
 
           _notifyUpdateStatus(DeliveryStatus.MarkArrivedDropPoint);
         } else if (s == 2) {
@@ -156,10 +156,14 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  void invokeTracking() {
+  void invokeTracking(int userId) {
+    // start listening location changes
+    _locationService.populateOnLocationChanged();
+
+    // subscribe to the stream
     locationSubscription =
         _locationService.locationStream.listen((LocationModel d) async {
-      await _locationService.sendLocation(d);
+      await _locationService.sendLocation(d, userId);
     });
   }
 

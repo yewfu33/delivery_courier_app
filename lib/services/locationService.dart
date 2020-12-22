@@ -29,7 +29,7 @@ class LocationService {
 
   Stream<LocationModel> get locationStream => _locationController.stream;
 
-  Sink<LocationModel> get locationSink => _locationController.sink;
+  StreamSubscription onLocationStreamSubscription;
 
   LocationService._init() {
     this.init();
@@ -65,22 +65,25 @@ class LocationService {
   }
 
   void populateOnLocationChanged() {
-    _location.onLocationChanged
+    onLocationStreamSubscription = _location.onLocationChanged
         .map((m) => LocationModel(latitude: m.latitude, longitude: m.longitude))
-        .distinct((LocationModel p, LocationModel n) =>
+        .distinct((p, n) =>
             (p.latitude == n.latitude) || (p.longitude == n.longitude))
-        .pipe(_locationController)
-        .then((_) => _locationController.close());
+        .listen((l) => _locationController.add(l));
   }
 
-  Future sendLocation(LocationModel location) async {
+  Future sendLocation(LocationModel location, int userId) async {
     try {
       // null safety
       if (hubConnection == null) return;
 
+      print(
+          "send location -------> ${location.latitude} , ${location.longitude}");
+
       await hubConnection.invoke(sendLocationName, args: <Object>[
         location.latitude,
         location.longitude,
+        userId,
       ]);
     } on GeneralError catch (e) {
       print('error in send. ' + e.toString());
@@ -90,6 +93,7 @@ class LocationService {
   }
 
   void dispose() {
+    onLocationStreamSubscription.cancel();
     _locationController.close();
   }
 }
