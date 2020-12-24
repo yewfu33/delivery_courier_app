@@ -100,8 +100,6 @@ class TaskProvider with ChangeNotifier {
           _currentAddress = order.dropPoint[0].address;
           _currentRemark = order.dropPoint[0].comment;
 
-          // indicate finish a dp
-          dropPointIndex += 1;
           // invoke location tracing
           invokeTracking(order.user.userId);
 
@@ -205,14 +203,15 @@ class TaskProvider with ChangeNotifier {
   }
 
   void notifyNextDropPoint() {
+    // indicate finish a dp
+    dropPointIndex += 1;
+
     _clock =
         "${this.extractTimeFormat(order.dropPoint[dropPointIndex].dateTime)} - Drop-point ${dropPointIndex + 1}";
     _currentTel = order.dropPoint[dropPointIndex].contact;
     _currentAddress = order.dropPoint[dropPointIndex].address;
     _currentRemark = order.dropPoint[dropPointIndex].comment;
 
-    // indicate finish a dp
-    dropPointIndex += 1;
     notifyListeners();
   }
 
