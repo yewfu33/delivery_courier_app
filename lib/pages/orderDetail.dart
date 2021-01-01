@@ -1,6 +1,5 @@
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
-import 'package:delivery_courier_app/model/dropPointModel.dart';
 import 'package:delivery_courier_app/model/enum.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/userModel.dart';
@@ -8,12 +7,14 @@ import 'package:delivery_courier_app/pages/onTaskPage.dart';
 import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
-import 'package:delivery_courier_app/styleScheme.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:delivery_courier_app/widgets/DropOffSection.dart';
+import 'package:delivery_courier_app/widgets/PickUpSection.dart';
+import 'package:delivery_courier_app/widgets/PricingSection.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../constant.dart';
 
@@ -29,6 +30,22 @@ class PickOrderDetail extends StatelessWidget {
     @required this.appProviderContext,
   }) : super(key: key);
 
+  String setWeightDisplay(int weight) {
+    switch (weight) {
+      case 0:
+        return '<10KG';
+        break;
+      case 10:
+        return '>10KG';
+        break;
+      case 50:
+        return '>50KG';
+        break;
+      default:
+        return '<10KG';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScrollConfiguration(
@@ -37,111 +54,82 @@ class PickOrderDetail extends StatelessWidget {
         controller: scrollController,
         child: Material(
           elevation: 10,
-          child: Container(
-            padding: const EdgeInsets.only(top: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const Divider(color: Colors.transparent, height: 5),
-                      if (order.status == DeliveryStatus.MarkArrivedPickUp)
-                        ActionButton(
-                          order: order,
-                          appProviderContext: appProviderContext,
-                        ),
-                      const Divider(color: Colors.transparent),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'RM 30',
-                              style: TextStyle(
-                                color: Constant.primaryColor,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Today at ${DateFormat('h:mm a').format(order.dateTime)}",
-                              // 'Today at 11.42 pm',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              order.name,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.3,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          ],
-                        ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Divider(color: Colors.transparent, height: 5),
+              if (order.status == DeliveryStatus.MarkArrivedPickUp)
+                ActionButton(
+                  order: order,
+                  appProviderContext: appProviderContext,
+                ),
+              const Divider(color: Colors.transparent),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Today at ${DateFormat('h:mm a').format(order.dateTime)}",
+                      // 'Today at 11.42 pm',
+                      style: TextStyle(
+                        color: Constant.primaryColor,
+                        fontSize: 20.5,
+                        fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            if (order.vehicleType == 0)
-                              FaIcon(
-                                FontAwesomeIcons.motorcycle,
-                                color: Constant.primaryColor,
-                              ),
-                            if (order.vehicleType == 1)
-                              FaIcon(
-                                FontAwesomeIcons.car,
-                                color: Constant.primaryColor,
-                              ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'By ${setVehicleType(order.vehicleType)}',
-                              style: const TextStyle(
-                                color: Constant.primaryColor,
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                    ),
+                    const SizedBox(height: 7),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        if (order.vehicleType == 0)
+                          FaIcon(FontAwesomeIcons.motorcycle, size: 20),
+                        if (order.vehicleType == 1)
+                          FaIcon(FontAwesomeIcons.car, size: 20),
+                        const SizedBox(width: 5),
+                        Text(
+                          '${setVehicleType(order.vehicleType)} (weight ${setWeightDisplay(order.weight.round())})',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      order.name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.3,
                       ),
-                    ],
-                  ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 7),
+                  ],
                 ),
-                const Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                  child: Divider(color: Colors.black),
-                ),
-                UserInfoSection(user: order.user),
-                const Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                  child: const Divider(color: Colors.black),
-                ),
-                //pickup location
-                PickUpSection(order: order),
-                const Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                  child: const Divider(color: Colors.black),
-                ),
-                //drop off location
-                DropOffLocationSection(dp: order.dropPoint),
-                // ActionButtonSection(),
-              ],
-            ),
+              ),
+              PriceSection(order: order),
+              const Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Divider(color: Colors.black, height: 5),
+              ),
+              UserInfoSection(user: order.user),
+              const Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: const Divider(color: Colors.black),
+              ),
+              //pickup location
+              PickUpSection(order: order),
+              const Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: const Divider(color: Colors.black),
+              ),
+              //drop off location
+              DropOffLocationSection(dp: order.dropPoint),
+            ],
           ),
         ),
       ),
@@ -156,6 +144,14 @@ class UserInfoSection extends StatelessWidget {
     Key key,
     @required this.user,
   }) : super(key: key);
+
+  Future<void> _makePhoneCall(String tel) async {
+    if (await canLaunch(tel)) {
+      await launch(tel);
+    } else {
+      print('Could not call $tel');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,16 +173,20 @@ class UserInfoSection extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      trailing: Container(
-        child: CircleAvatar(
-          backgroundColor: Colors.green[400],
-          radius: 20,
-          child: Icon(
-            Icons.call,
-            color: Colors.white,
-            size: 20,
-          ),
+      trailing: FlatButton.icon(
+        onPressed: () {
+          _makePhoneCall("tel:+60${user.phoneNum}");
+        },
+        icon: const Icon(
+          Icons.call,
+          color: Colors.white,
+          size: 20,
         ),
+        color: Colors.green,
+        textColor: Colors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+        label: const Text("Call"),
       ),
     );
   }
@@ -195,6 +195,7 @@ class UserInfoSection extends StatelessWidget {
 class ActionButton extends StatefulWidget {
   final OrderModel order;
   final BuildContext appProviderContext;
+
   const ActionButton({
     Key key,
     @required this.order,
@@ -206,6 +207,9 @@ class ActionButton extends StatefulWidget {
 }
 
 class _ActionButtonState extends State<ActionButton> {
+  MapProvider model;
+  AppProvider app;
+
   Future<bool> openConfimationDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -239,11 +243,14 @@ class _ActionButtonState extends State<ActionButton> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
-    final AppProvider app =
-        Provider.of<AppProvider>(widget.appProviderContext, listen: false);
+  void initState() {
+    super.initState();
+    model = Provider.of<MapProvider>(context, listen: false);
+    app = Provider.of<AppProvider>(widget.appProviderContext, listen: false);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
@@ -277,188 +284,15 @@ class _ActionButtonState extends State<ActionButton> {
           }
         },
         color: Constant.primaryColor,
-        child: Text(
+        child: const Text(
           'TAKE ORDER',
-          style: contentStyle.copyWith(
+          style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w700,
+            fontSize: 15,
+            letterSpacing: 0.4,
+            fontWeight: FontWeight.w600,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class PickUpSection extends StatelessWidget {
-  final OrderModel order;
-  const PickUpSection({Key key, this.order}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
-
-    return Container(
-      padding: const EdgeInsets.only(top: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0),
-            child: Text(
-              'Pickup Location',
-              style: TextStyle(
-                color: Constant.primaryColor,
-                letterSpacing: 0.4,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Stepper(
-            physics: NeverScrollableScrollPhysics(),
-            controlsBuilder: (BuildContext context,
-                    {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
-                Container(),
-            currentStep: 0,
-            onStepTapped: (index) {
-              model.onTapPickUpLocation();
-            },
-            steps: [
-              Step(
-                isActive: true,
-                title: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.76,
-                  child: Text(
-                    order.address,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(height: 1.3, letterSpacing: 0.3),
-                  ),
-                ),
-                subtitle: Text(
-                    "Today at ${DateFormat('h:mm a').format(order.dateTime)}"),
-                content: Container(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FlatButton(
-                        color: Colors.grey[300],
-                        onPressed: () {},
-                        child: Text('Call +60 ${order.contact}'),
-                      ),
-                      const SizedBox(height: 3),
-                      (order.comment.isNotEmpty)
-                          ? Text(order.comment)
-                          : SizedBox.shrink(),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Row(
-                          children: <Widget>[
-                            const FaIcon(
-                              FontAwesomeIcons.wallet,
-                            ),
-                            const SizedBox(width: 6),
-                            const Text('Payment at this address'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class DropOffLocationSection extends StatefulWidget {
-  final List<DropPointModel> dp;
-
-  const DropOffLocationSection({Key key, this.dp}) : super(key: key);
-
-  @override
-  _DropOffLocationSectionState createState() => _DropOffLocationSectionState();
-}
-
-class _DropOffLocationSectionState extends State<DropOffLocationSection> {
-  int _step = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final MapProvider model = Provider.of<MapProvider>(context, listen: false);
-
-    return Container(
-      padding: const EdgeInsets.only(top: 10, bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0),
-            child: Text(
-              'Drop Off Location (${widget.dp.length})',
-              style: TextStyle(
-                color: Constant.primaryColor,
-                letterSpacing: 0.4,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Stepper(
-            physics: NeverScrollableScrollPhysics(),
-            controlsBuilder: (_,
-                    {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
-                Container(),
-            currentStep: _step,
-            onStepTapped: (int i) {
-              setState(() => _step = i);
-              model.onTapDropOffLocation(i);
-            },
-            steps: [
-              for (var i = 0; i < widget.dp.length; i++)
-                Step(
-                  isActive: true,
-                  title: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.76,
-                    child: Text(
-                      widget.dp[i].address,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 3,
-                      style: const TextStyle(height: 1.3, letterSpacing: 0.3),
-                    ),
-                  ),
-                  subtitle: Text(DateFormat('dd MMM yyyy h:mm a')
-                      .format(widget.dp[i].dateTime)),
-                  content: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FlatButton(
-                          color: Colors.grey[300],
-                          onPressed: () {},
-                          child: Text('Call +60 ${widget.dp[i].contact}'),
-                        ),
-                        const SizedBox(height: 3),
-                        (widget.dp[i].comment.isNotEmpty)
-                            ? Text(widget.dp[i].comment)
-                            : SizedBox.shrink(),
-                      ],
-                    ),
-                  ),
-                )
-            ],
-          ),
-        ],
       ),
     );
   }
