@@ -7,7 +7,6 @@ import 'package:delivery_courier_app/model/locationModel.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/services/locationService.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -41,6 +40,8 @@ class TaskProvider with ChangeNotifier {
   String get currentTel => _currentTel;
   String _currentAddress;
   String get currentAddress => _currentAddress;
+  LatLng _currentLatLng;
+  LatLng get currentLatLng => _currentLatLng;
   String _currentRemark;
   String get currentRemark => _currentRemark;
 
@@ -67,6 +68,7 @@ class TaskProvider with ChangeNotifier {
     _clock = "${this.extractTimeFormat(order.dateTime)} - Pick-up";
     _currentTel = order.user.phoneNum;
     _currentAddress = order.address;
+    _currentLatLng = LatLng(order.latitude, order.longitude);
     _currentRemark = order.comment;
     _dpLength = order.dropPoint.length;
   }
@@ -98,6 +100,8 @@ class TaskProvider with ChangeNotifier {
               "${this.extractTimeFormat(order.dropPoint[0].dateTime)} - Drop-point ${dropPointIndex + 1}";
           _currentTel = order.dropPoint[0].contact;
           _currentAddress = order.dropPoint[0].address;
+          _currentLatLng =
+              LatLng(order.dropPoint[0].latitude, order.dropPoint[0].longitude);
           _currentRemark = order.dropPoint[0].comment;
 
           // invoke location tracing
@@ -210,6 +214,8 @@ class TaskProvider with ChangeNotifier {
         "${this.extractTimeFormat(order.dropPoint[dropPointIndex].dateTime)} - Drop-point ${dropPointIndex + 1}";
     _currentTel = order.dropPoint[dropPointIndex].contact;
     _currentAddress = order.dropPoint[dropPointIndex].address;
+    _currentLatLng = LatLng(order.dropPoint[dropPointIndex].latitude,
+        order.dropPoint[dropPointIndex].longitude);
     _currentRemark = order.dropPoint[dropPointIndex].comment;
 
     notifyListeners();

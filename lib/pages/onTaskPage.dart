@@ -4,6 +4,8 @@ import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/enum.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
+import 'package:delivery_courier_app/widgets/GreyBoxContainer.dart';
+import 'package:delivery_courier_app/widgets/PaymentSection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -184,9 +186,10 @@ class Panel extends StatelessWidget {
                 address: p.currentAddress,
                 phoneNum: p.currentTel,
                 remark: p.currentRemark,
+                latLng: p.currentLatLng,
               ),
               //   SignaturesSection(),
-              PaymentSection(),
+              PaymentSection(price: order.price, user: p.user),
             ],
           ),
         ),
@@ -302,6 +305,7 @@ class UserInfoSection extends StatelessWidget {
   final String phoneNum;
   final String address;
   final String remark;
+  final LatLng latLng;
 
   const UserInfoSection({
     Key key,
@@ -309,13 +313,27 @@ class UserInfoSection extends StatelessWidget {
     @required this.phoneNum,
     @required this.address,
     @required this.remark,
+    @required this.latLng,
   }) : super(key: key);
 
-  Future<void> _makePhoneCall(String tel) async {
+  Future _makePhoneCall(String tel) async {
     if (await canLaunch(tel)) {
       await launch(tel);
     } else {
       print('Could not call $tel');
+    }
+  }
+
+  Future _launchMap(double lat, double lng) async {
+    final googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+
+    final String encodedURl = Uri.encodeFull(googleMapsUrl);
+
+    if (await canLaunch(encodedURl)) {
+      await launch(encodedURl);
+    } else {
+      print('Could not launch map');
     }
   }
 
@@ -404,7 +422,9 @@ class UserInfoSection extends StatelessWidget {
                 const VerticalDivider(),
                 Expanded(
                   child: FlatButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      _launchMap(latLng.latitude, latLng.longitude);
+                    },
                     icon: const Icon(Icons.near_me),
                     color: Colors.grey[300],
                     label: Text('Direction'),
@@ -414,146 +434,6 @@ class UserInfoSection extends StatelessWidget {
             ),
           )
         ],
-      ),
-    );
-  }
-}
-
-class SignaturesSection extends StatelessWidget {
-  const SignaturesSection({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      child: Column(
-        children: [
-          GreyBoxContainer(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Signatures',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                ),
-                Icon(Icons.add, size: 24),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            alignment: WrapAlignment.center,
-            children: [
-              Text('No Signature yet'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PaymentSection extends StatelessWidget {
-  const PaymentSection({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      child: Column(
-        children: [
-          GreyBoxContainer(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Payments',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Table(
-              children: [
-                TableRow(
-                  children: [
-                    CustomTableCell(content: Text('Your Commission')),
-                    CustomTableCell(content: Text('Rm 4')),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    CustomTableCell(content: Text('Payment Method')),
-                    CustomTableCell(content: Text('Cash Payment')),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    CustomTableCell(content: Text('Payment Status')),
-                    CustomTableCell(content: Text('Pending')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-          FlatButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.payment),
-            color: Colors.grey[300],
-            label: Text('Add Payment'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class GreyBoxContainer extends StatelessWidget {
-  final Widget child;
-
-  const GreyBoxContainer({
-    Key key,
-    @required this.child,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      child: child,
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.all(Radius.circular(3)),
-      ),
-    );
-  }
-}
-
-class CustomTableCell extends StatelessWidget {
-  final Widget content;
-
-  const CustomTableCell({Key key, @required this.content}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TableCell(
-      child: SizedBox(
-        height: 25,
-        child: content,
       ),
     );
   }
