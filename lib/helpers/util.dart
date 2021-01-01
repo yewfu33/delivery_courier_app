@@ -1,13 +1,13 @@
-// get vehicle type
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// get vehicle type
 String setVehicleType(int type) {
   switch (type) {
-    case 1:
+    case 0:
       return 'Motorbike';
       break;
-    case 2:
+    case 1:
       return 'Car';
       break;
     default:

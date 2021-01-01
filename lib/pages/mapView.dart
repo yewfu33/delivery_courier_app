@@ -2,22 +2,24 @@ import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/pages/orderDetail.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:flutter/material.dart';
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:provider/provider.dart';
 
 class MapView extends StatelessWidget {
+  const MapView({
+    Key key,
+    @required this.appProviderContext,
+  }) : super(key: key);
+
+  final BuildContext appProviderContext;
+
   @override
   Widget build(BuildContext context) {
-    final List arguments = ModalRoute.of(context).settings.arguments;
-    final OrderModel order = arguments[0];
-    final BuildContext appProviderContext = arguments[1];
+    final OrderModel order = ModalRoute.of(context).settings.arguments;
 
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        // backgroundColor: Colors.transparent,
-        // elevation: 1.0,
         leading: const BackButton(),
         title: Text('Order #${order.orderId}'),
         actions: [

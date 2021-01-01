@@ -159,10 +159,16 @@ class _TaskListState extends State<TaskList> {
 
         if (!snapshot.hasData || snapshot.data.length == 0) return EmptyTask();
 
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children:
-              snapshot.data.map((o) => PickOrderList(orderModel: o)).toList(),
+        return ListView.separated(
+          physics: AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
+          itemCount: snapshot.data.length,
+          itemBuilder: (_, i) {
+            return PickOrderList(orderModel: snapshot.data[i]);
+          },
+          separatorBuilder: (_, __) {
+            return const Divider(color: Colors.transparent);
+          },
         );
       },
     );

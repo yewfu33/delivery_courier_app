@@ -1,7 +1,9 @@
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/pages/mapView.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 import '../constant.dart';
 
@@ -14,27 +16,30 @@ class PickOrderList extends StatelessWidget {
     return InkWell(
       onTap: () {
         // push to detail page
-        Navigator.pushNamed(context, '/details',
-            arguments: [orderModel, context]);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MapView(appProviderContext: context),
+            settings: RouteSettings(arguments: orderModel),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
-        margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 11),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Row(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Icon(Icons.access_time),
+                const Icon(Icons.access_time),
                 const SizedBox(width: 7),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 1.5, horizontal: 4),
                   child: Text(
-                    '11:42 PM',
-                    // DateFormat('dd MMM yyyy | h:mm a').format(order.dateTime),
+                    DateFormat('h:mm a').format(orderModel.dateTime),
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w500),
                   ),
@@ -53,7 +58,7 @@ class PickOrderList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 9, bottom: 9),
               child: Text(
-                'RM 30',
+                'RM ${orderModel.price}',
                 style: const TextStyle(
                   fontSize: 16.5,
                   color: Constant.primaryColor,

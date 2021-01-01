@@ -1,19 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'Loading.dart';
+import '../constant.dart';
 
+// splash screen
 class SplashScreen extends StatelessWidget {
+  const SplashScreen({
+    Key key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.local_shipping, size: 35),
-            Loading(),
-          ],
-        ));
+      body: Center(
+        child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Constant.primaryColor),
+        ),
+      ),
+    );
   }
 }

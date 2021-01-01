@@ -13,6 +13,8 @@ import '../constant.dart';
 import '../main.dart';
 
 class MyDrawer extends StatelessWidget {
+  const MyDrawer({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final User user = context.select<AppProvider, User>((p) => p.user);
@@ -23,7 +25,7 @@ class MyDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.10,
               child: Row(
@@ -46,17 +48,13 @@ class MyDrawer extends StatelessWidget {
                         Text(
                           user.name,
                           style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16.5,
-                          ),
+                              fontWeight: FontWeight.w700, fontSize: 16.5),
                         ),
                         const SizedBox(height: 2.5),
-                        Text(
+                        const Text(
                           'ON DUTY', // off
                           style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
+                              fontWeight: FontWeight.w500, fontSize: 11),
                         ),
                       ],
                     ),
@@ -75,9 +73,9 @@ class MyDrawer extends StatelessWidget {
               color: Colors.grey[200],
             ),
             DrawerListTile(
-              onTap: () => changeScreenReplacement(context, MyHomePage()),
+              onTap: () => changeScreen(context, MyHomePage()),
               text: "Pick-up",
-              leading: FaIcon(FontAwesomeIcons.truckLoading),
+              leading: const FaIcon(FontAwesomeIcons.truckLoading),
             ),
             DrawerListTile(
               onTap: () => changeScreen(
@@ -88,12 +86,12 @@ class MyDrawer extends StatelessWidget {
                 ),
               ),
               text: "My Task",
-              leading: FaIcon(FontAwesomeIcons.history),
+              leading: const FaIcon(FontAwesomeIcons.history),
             ),
             DrawerListTile(
               onTap: null,
               text: "Earnings",
-              leading: FaIcon(FontAwesomeIcons.wallet),
+              leading: const FaIcon(FontAwesomeIcons.wallet),
             ),
             DrawerListTile(
               onTap: () {
@@ -106,7 +104,7 @@ class MyDrawer extends StatelessWidget {
                 );
               },
               text: "Settings",
-              leading: FaIcon(FontAwesomeIcons.slidersH),
+              leading: const FaIcon(FontAwesomeIcons.slidersH),
             ),
             ListTile(
               title: FlatButton(
@@ -114,7 +112,7 @@ class MyDrawer extends StatelessWidget {
                   await Provider.of<UserProvider>(context, listen: false)
                       .signOut();
                 },
-                child: Text('logout'),
+                child: const Text('logout'),
               ),
             ),
           ],
