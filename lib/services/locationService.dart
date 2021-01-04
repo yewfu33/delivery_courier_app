@@ -94,6 +94,5 @@ class LocationService {
 
   void dispose() {
     onLocationStreamSubscription.cancel();
-    _locationController.close();
   }
 }

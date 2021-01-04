@@ -1,4 +1,5 @@
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/pages/orderDetail.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,12 @@ import 'package:provider/provider.dart';
 class MapView extends StatelessWidget {
   const MapView({
     Key key,
-    @required this.appProviderContext,
+    @required this.user,
+    @required this.isRestoreOnTaskPage,
   }) : super(key: key);
 
-  final BuildContext appProviderContext;
+  final User user;
+  final bool isRestoreOnTaskPage;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +75,8 @@ class MapView extends StatelessWidget {
                   return PickOrderDetail(
                     order: order,
                     scrollController: scrollController,
-                    appProviderContext: appProviderContext,
+                    user: user,
+                    isRestoreOnTaskPage: isRestoreOnTaskPage,
                   );
                 },
               ),

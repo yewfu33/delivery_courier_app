@@ -1,5 +1,6 @@
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/pages/mapView.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,7 +10,15 @@ import '../constant.dart';
 
 class PickOrderList extends StatelessWidget {
   final OrderModel orderModel;
-  const PickOrderList({Key key, @required this.orderModel}) : super(key: key);
+  final User user;
+  final bool isRestoreOnTaskPage;
+
+  const PickOrderList({
+    Key key,
+    @required this.orderModel,
+    @required this.user,
+    this.isRestoreOnTaskPage = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +28,8 @@ class PickOrderList extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => MapView(appProviderContext: context),
+            builder: (_) =>
+                MapView(user: user, isRestoreOnTaskPage: isRestoreOnTaskPage),
             settings: RouteSettings(arguments: orderModel),
           ),
         );

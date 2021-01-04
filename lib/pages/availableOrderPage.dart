@@ -101,7 +101,10 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                         vertical: 13, horizontal: 12),
                     itemCount: snapshot.data.length,
                     itemBuilder: (_, i) {
-                      return PickOrderList(orderModel: snapshot.data[i]);
+                      return PickOrderList(
+                        orderModel: snapshot.data[i],
+                        user: provider.user,
+                      );
                     },
                     separatorBuilder: (_, __) {
                       return const Divider(color: Colors.transparent);

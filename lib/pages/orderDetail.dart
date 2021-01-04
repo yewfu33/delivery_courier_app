@@ -2,12 +2,14 @@ import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/helpers/util.dart';
 import 'package:delivery_courier_app/model/enum.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/model/userModel.dart';
 import 'package:delivery_courier_app/pages/onTaskPage.dart';
 import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:delivery_courier_app/widgets/DropOffSection.dart';
+import 'package:delivery_courier_app/widgets/Loading.dart';
 import 'package:delivery_courier_app/widgets/PickUpSection.dart';
 import 'package:delivery_courier_app/widgets/PricingSection.dart';
 import 'package:flutter/material.dart';
@@ -21,13 +23,15 @@ import '../constant.dart';
 class PickOrderDetail extends StatelessWidget {
   final OrderModel order;
   final ScrollController scrollController;
-  final BuildContext appProviderContext;
+  final User user;
+  final bool isRestoreOnTaskPage;
 
   const PickOrderDetail({
     Key key,
     @required this.order,
     @required this.scrollController,
-    @required this.appProviderContext,
+    @required this.user,
+    @required this.isRestoreOnTaskPage,
   }) : super(key: key);
 
   String setWeightDisplay(int weight) {
@@ -61,7 +65,8 @@ class PickOrderDetail extends StatelessWidget {
               if (order.status == DeliveryStatus.MarkArrivedPickUp)
                 ActionButton(
                   order: order,
-                  appProviderContext: appProviderContext,
+                  user: user,
+                  checkIsRestoreOnTaskPage: isRestoreOnTaskPage,
                 ),
               const Divider(color: Colors.transparent),
               Container(
@@ -70,7 +75,7 @@ class PickOrderDetail extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "Today at ${DateFormat('h:mm a').format(order.dateTime)}",
+                      "${DateFormat('dd MMM | h:mm a').format(order.dateTime)}",
                       // 'Today at 11.42 pm',
                       style: TextStyle(
                         color: Constant.primaryColor,
@@ -194,12 +199,14 @@ class UserInfoSection extends StatelessWidget {
 
 class ActionButton extends StatefulWidget {
   final OrderModel order;
-  final BuildContext appProviderContext;
+  final User user;
+  final bool checkIsRestoreOnTaskPage;
 
   const ActionButton({
     Key key,
     @required this.order,
-    @required this.appProviderContext,
+    @required this.user,
+    @required this.checkIsRestoreOnTaskPage,
   }) : super(key: key);
 
   @override
@@ -208,7 +215,7 @@ class ActionButton extends StatefulWidget {
 
 class _ActionButtonState extends State<ActionButton> {
   MapProvider model;
-  AppProvider app;
+  bool loading = false;
 
   Future<bool> openConfimationDialog(BuildContext context) {
     return showDialog(
@@ -246,7 +253,6 @@ class _ActionButtonState extends State<ActionButton> {
   void initState() {
     super.initState();
     model = Provider.of<MapProvider>(context, listen: false);
-    app = Provider.of<AppProvider>(widget.appProviderContext, listen: false);
   }
 
   @override
@@ -254,46 +260,81 @@ class _ActionButtonState extends State<ActionButton> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
-      child: RaisedButton(
-        onPressed: () async {
-          var confirmation = await openConfimationDialog(context);
-          if (confirmation ?? false) {
-            var isSuccessRegistered = await model.registerOrder(
-                context, widget.order.orderId, app.user);
+      child: (loading)
+          ? Loading()
+          : (!widget.checkIsRestoreOnTaskPage)
+              ? RaisedButton(
+                  onPressed: () async {
+                    var confirmation = await openConfimationDialog(context);
 
-            if (isSuccessRegistered) {
-              changeScreenReplacement(
-                context,
-                ChangeNotifierProvider(
-                  create: (_) => TaskProvider(
-                      markers: model.markers,
-                      destination: model.destination,
-                      origin: model.origin,
-                      poly: model.poly,
-                      user: app.user,
-                      order: widget.order),
-                  builder: (_, __) {
-                    return OnTaskPage(
-                      order: widget.order,
-                      snackBarMessage: "Successfully registered task",
+                    if (confirmation ?? false) {
+                      setState(() => loading = true);
+                      var isSuccessRegistered = await model.registerOrder(
+                          context, widget.order.orderId, widget.user);
+
+                      if (isSuccessRegistered) {
+                        changeScreenReplacement(
+                          context,
+                          ChangeNotifierProvider(
+                            create: (_) => TaskProvider(
+                                markers: model.markers,
+                                destination: model.destination,
+                                origin: model.origin,
+                                poly: model.poly,
+                                user: widget.user,
+                                order: widget.order),
+                            builder: (_, __) {
+                              return OnTaskPage(
+                                order: widget.order,
+                                snackBarMessage: "Successfully registered task",
+                              );
+                            },
+                          ),
+                        );
+                      }
+                    }
+                    setState(() => loading = false);
+                  },
+                  color: Constant.primaryColor,
+                  child: const Text(
+                    'TAKE ORDER',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+              : RaisedButton(
+                  onPressed: () {
+                    changeScreenReplacement(
+                      context,
+                      ChangeNotifierProvider(
+                        create: (_) => TaskProvider(
+                            markers: model.markers,
+                            destination: model.destination,
+                            origin: model.origin,
+                            poly: model.poly,
+                            user: widget.user,
+                            order: widget.order),
+                        builder: (_, __) {
+                          return OnTaskPage(order: widget.order);
+                        },
+                      ),
                     );
                   },
+                  color: Constant.primaryColor,
+                  child: const Text(
+                    'BACK TO TASK PAGE',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              );
-            }
-          }
-        },
-        color: Constant.primaryColor,
-        child: const Text(
-          'TAKE ORDER',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            letterSpacing: 0.4,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 }

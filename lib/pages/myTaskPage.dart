@@ -40,19 +40,16 @@ class MyTaskPage extends StatelessWidget {
         body: TabBarView(
           children: [
             TaskList(
-              courierId: user.id,
               status: 0,
-              token: user.token,
+              user: user,
             ),
             TaskList(
-              courierId: user.id,
               status: 2,
-              token: user.token,
+              user: user,
             ),
             TaskList(
-              courierId: user.id,
               status: 3,
-              token: user.token,
+              user: user,
             ),
           ],
         ),
@@ -92,15 +89,13 @@ class EmptyTask extends StatelessWidget {
 }
 
 class TaskList extends StatefulWidget {
-  final int courierId;
   final int status;
-  final String token;
+  final User user;
 
   const TaskList({
     Key key,
-    @required this.courierId,
     @required this.status,
-    @required this.token,
+    @required this.user,
   }) : super(key: key);
 
   @override
@@ -125,9 +120,9 @@ class _TaskListState extends State<TaskList> {
 
     try {
       http.Response res = await http.post(
-        path + widget.courierId.toString() + '?$query',
+        path + widget.user.id.toString() + '?$query',
         headers: {
-          'Authorization': 'Bearer ${widget.token}',
+          'Authorization': 'Bearer ${widget.user.token}',
         },
       );
 
@@ -164,7 +159,11 @@ class _TaskListState extends State<TaskList> {
           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
           itemCount: snapshot.data.length,
           itemBuilder: (_, i) {
-            return PickOrderList(orderModel: snapshot.data[i]);
+            return PickOrderList(
+              orderModel: snapshot.data[i],
+              user: widget.user,
+              isRestoreOnTaskPage: true,
+            );
           },
           separatorBuilder: (_, __) {
             return const Divider(color: Colors.transparent);
