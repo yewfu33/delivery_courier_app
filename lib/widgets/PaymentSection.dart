@@ -1,6 +1,12 @@
+import 'dart:convert';
+
+import 'package:delivery_courier_app/model/orderModel.dart';
+import 'package:delivery_courier_app/model/paymentModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
+import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../constant.dart';
 import 'GreyBoxContainer.dart';
@@ -8,32 +14,37 @@ import 'GreyBoxContainer.dart';
 class PaymentSection extends StatefulWidget {
   const PaymentSection({
     Key key,
-    @required this.price,
     @required this.user,
+    @required this.order,
   }) : super(key: key);
 
-  final double price;
   final User user;
+  final OrderModel order;
 
   @override
   _PaymentSectionState createState() => _PaymentSectionState();
 }
 
 class _PaymentSectionState extends State<PaymentSection> {
+  TaskProvider model;
   String paymentStatus = "Pending";
   double commission;
+  bool added = false;
+  bool loading = false;
   final getCourierCommissionPath =
       "${Constant.serverName}api/couriers/commission/";
+  final addPaymentPath = "${Constant.serverName}api/orders/payment";
 
   @override
   void initState() {
     super.initState();
+    //obtain model instance with listen false
+    model = Provider.of<TaskProvider>(context, listen: false);
+
     readCourierCommission().then((c) {
-      if (mounted) {
-        setState(() {
-          commission = c;
-        });
-      }
+      setState(() {
+        commission = c;
+      });
     });
   }
 
@@ -57,6 +68,68 @@ class _PaymentSectionState extends State<PaymentSection> {
       print("fail to get commission");
       return null;
     }
+  }
+
+  Future<bool> addPayment(BuildContext context) async {
+    try {
+      var postBody = PaymentModel(
+        amount: widget.order.price,
+        courierPay: widget.order.price * commission,
+        orderId: widget.order.orderId,
+        courierId: widget.user.id,
+        userId: widget.order.userId,
+      );
+
+      var res = await http.post(
+        addPaymentPath,
+        headers: {
+          "authorization": "Bearer ${widget.user.token}",
+          "content-type": "application/json",
+        },
+        body: json.encode(postBody.toMap()),
+      );
+
+      if (res.statusCode == 200) {
+        setState(() {
+          paymentStatus = "Paid";
+        });
+
+        return true;
+      } else {
+        showRetryDialog(context);
+        return false;
+      }
+    } catch (e) {
+      print("fail add payment");
+      showRetryDialog(context);
+      return false;
+    }
+  }
+
+  void showRetryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Constant.primaryColor,
+          ),
+        ),
+        child: AlertDialog(
+          title: Text("Error"),
+          content: Text("Something went wrong try again later."),
+          actions: [
+            FlatButton(
+              onPressed: () {
+                Navigator.of(_).pop();
+              },
+              child: Text('OK'),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -87,7 +160,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                 TableRow(
                   children: [
                     CustomTableCell(content: Text('Order fee')),
-                    CustomTableCell(content: Text('RM ${widget.price}')),
+                    CustomTableCell(content: Text('RM ${widget.order.price}')),
                   ],
                 ),
                 TableRow(
@@ -95,7 +168,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                     CustomTableCell(content: Text('Your Commission')),
                     CustomTableCell(
                         content: Text((commission != null)
-                            ? 'RM ${widget.price * commission}'
+                            ? 'RM ${widget.order.price * commission}'
                             : '')),
                   ],
                 ),
@@ -116,7 +189,23 @@ class _PaymentSectionState extends State<PaymentSection> {
           ),
           const SizedBox(height: 14),
           FlatButton.icon(
-            onPressed: () {},
+            onPressed: (loading)
+                ? null
+                : () async {
+                    setState(() {
+                      loading = true;
+                    });
+
+                    var success = await addPayment(context);
+
+                    if (success) {
+                      model.notifyPaid();
+                    } else {
+                      setState(() {
+                        loading = false;
+                      });
+                    }
+                  },
             icon: Icon(Icons.payment),
             color: Colors.grey[300],
             label: Text('Add Payment'),

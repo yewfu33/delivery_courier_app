@@ -16,11 +16,11 @@ import 'package:intl/intl.dart';
 
 import 'appProvider.dart';
 
-class TaskProvider with ChangeNotifier {
+class TaskProvider extends ChangeNotifier {
   GoogleMapController _mapController;
   final LocationService _locationService = LocationService();
 
-  StreamSubscription locationSubscription;
+  StreamSubscription _locationSubscription;
 
   final LatLng origin;
   final List<LatLng> destination;
@@ -50,6 +50,12 @@ class TaskProvider with ChangeNotifier {
   int _dpLength;
   int get dpLength => _dpLength;
 
+  bool _addedPayment = false;
+  bool get addedPayment => _addedPayment;
+
+  bool _cancelable = true;
+  bool get isCancelable => _cancelable;
+
   final updateStatusPath =
       "${Constant.serverName}${Constant.orderPath}/status/update/";
 
@@ -64,7 +70,7 @@ class TaskProvider with ChangeNotifier {
     @required this.order,
   }) {
     // initliaze from the order
-    _status = order.status;
+    _status = DeliveryStatus.StartDeliveryTask;
     _clock = "${this.extractTimeFormat(order.dateTime)} - Pick-up";
     _currentTel = order.user.phoneNum;
     _currentAddress = order.address;
@@ -78,15 +84,14 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future updateDeliveryStatus(int id, int status,
-      {BuildContext context}) async {
+  Future updateDeliveryStatus(int status, {BuildContext context}) async {
     String query = [
       'status=$status',
     ].join('&');
 
     try {
       http.Response res = await http.post(
-        updateStatusPath + id.toString() + '?$query',
+        updateStatusPath + order.orderId.toString() + '?$query',
         headers: {
           'Authorization': 'Bearer ${user.token}',
         },
@@ -115,9 +120,13 @@ class TaskProvider with ChangeNotifier {
             "detailss",
             false,
           );
-
-          // close the stream
-          locationSubscription.cancel();
+        } else if (s == 3) {
+          AppProvider.openCustomDialog(
+            context,
+            "Delivery Order Cancelled",
+            "detailss",
+            false,
+          );
         }
       } else {
         print('====== fail to update status');
@@ -127,11 +136,11 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future invokeSendNotifications(String title, String fcmToken,
+  Future invokeSendNotifications(String title,
       {DeliveryStatus toUpdateStatus}) async {
     try {
       var body = {
-        "fcmToken": fcmToken,
+        "fcmToken": order.user.fcmToken,
         "collapseKey": title,
         "title": title,
         "body": "Click enter the app for more info"
@@ -158,47 +167,28 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future cancelDeliveryOrder(BuildContext c) async {
+    await updateDeliveryStatus(3, context: c);
+    await invokeSendNotifications("Courier have cancelled your delivery order");
+  }
+
+  void notifyPaid() {
+    _addedPayment = true;
+    _cancelable = false;
+
+    // refers changes
+    notifyListeners();
+  }
+
   void invokeTracking(int userId) {
     // start listening location changes
     _locationService.populateOnLocationChanged();
 
     // subscribe to the stream
-    locationSubscription =
+    _locationSubscription =
         _locationService.locationStream.listen((LocationModel d) async {
       await _locationService.sendLocation(d, userId);
     });
-  }
-
-  void showConfirmationDialog(
-      BuildContext context, String text, AsyncCallback callback) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => Theme(
-        data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
-            primary: Constant.primaryColor,
-          ),
-        ),
-        child: AlertDialog(
-          title: Text("Confirmation"),
-          content: Text(text),
-          actions: [
-            FlatButton(
-              onPressed: () => Navigator.of(_).pop(),
-              child: Text('CANCEL'),
-            ),
-            FlatButton(
-              onPressed: () async {
-                await callback();
-                Navigator.of(_).pop();
-              },
-              child: Text('YES'),
-            )
-          ],
-        ),
-      ),
-    );
   }
 
   void _notifyUpdateStatus(DeliveryStatus status) {
@@ -246,5 +236,46 @@ class TaskProvider with ChangeNotifier {
     LatLngBounds bounds = LatLngBounds(
         northeast: LatLng(nLat, nLng), southwest: LatLng(sLat, sLng));
     _mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
+  }
+
+  void showConfirmationDialog(
+      BuildContext context, String text, AsyncCallback callback) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Constant.primaryColor,
+          ),
+        ),
+        child: AlertDialog(
+          title: Text("Confirmation"),
+          content: Text(text),
+          actions: [
+            FlatButton(
+              onPressed: () => Navigator.of(_).pop(),
+              child: Text('CANCEL'),
+            ),
+            FlatButton(
+              onPressed: () async {
+                await callback();
+                Navigator.of(_).pop();
+              },
+              child: Text('YES'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    if (_locationSubscription != null) {
+      _locationSubscription.cancel();
+      _locationService.dispose();
+    }
+    super.dispose();
   }
 }

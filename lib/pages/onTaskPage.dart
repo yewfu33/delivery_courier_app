@@ -44,26 +44,76 @@ class _OnTaskPageState extends State<OnTaskPage> {
     });
   }
 
+  void showCancelOrderConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Theme(
+        data: ThemeData(
+          colorScheme: ColorScheme.light().copyWith(
+            primary: Constant.primaryColor,
+          ),
+        ),
+        child: AlertDialog(
+          title: Text("Confirmation"),
+          content: Text("Cancel the delivery order?"),
+          actions: [
+            FlatButton(
+              onPressed: () => Navigator.of(_).pop(),
+              child: Text('NO'),
+            ),
+            FlatButton(
+              onPressed: () async {
+                await Provider.of<TaskProvider>(context, listen: false)
+                    .cancelDeliveryOrder(_);
+              },
+              child: Text('YES'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<TaskProvider>(context);
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
         title: Text("Order #${widget.order.orderId}"),
         leading: BackButton(
           onPressed: () {
-            changeScreenReplacement(context, MyHomePage());
+            if (model.isCancelable) {
+              changeScreenReplacement(context, MyHomePage());
+            } else {
+              showCancelOrderConfirmation(context);
+            }
           },
         ),
         actions: [
-          IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+          PopupMenuButton(
+            onSelected: (_) {
+              showCancelOrderConfirmation(context);
+            },
+            offset: Offset(0, 40),
+            itemBuilder: (_) {
+              return [
+                const PopupMenuItem(
+                  value: true,
+                  child: const Text('Cancel Delivery Order'),
+                ),
+              ];
+            },
+          ),
         ],
       ),
       body: Stack(
         children: [
           Positioned.fill(
             bottom: MediaQuery.of(context).size.height * 0.4,
-            child: BackPanel(order: widget.order),
+            child: BackPanel(order: widget.order, map: model),
           ),
           Positioned.fill(
             child: DraggableScrollableSheet(
@@ -86,13 +136,16 @@ class _OnTaskPageState extends State<OnTaskPage> {
 
 class BackPanel extends StatelessWidget {
   final OrderModel order;
+  final TaskProvider map;
 
-  const BackPanel({Key key, @required this.order}) : super(key: key);
+  const BackPanel({
+    Key key,
+    @required this.order,
+    @required this.map,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final map = Provider.of<TaskProvider>(context);
-
     return GoogleMap(
       mapType: MapType.normal,
       myLocationEnabled: true,
@@ -140,10 +193,8 @@ class Panel extends StatelessWidget {
             children: [
               UpdateStatusButton(
                 status: p.status,
-                orderId: order.orderId,
                 currentDropPointIndex: p.dropPointIndex,
                 dpLength: p.dpLength,
-                userFcmToken: order.user.fcmToken,
               ),
               Container(
                 padding:
@@ -189,7 +240,7 @@ class Panel extends StatelessWidget {
                 latLng: p.currentLatLng,
               ),
               //   SignaturesSection(),
-              PaymentSection(price: order.price, user: p.user),
+              PaymentSection(user: p.user, order: order),
             ],
           ),
         ),
@@ -200,18 +251,14 @@ class Panel extends StatelessWidget {
 
 class UpdateStatusButton extends StatelessWidget {
   final DeliveryStatus status;
-  final int orderId;
   final int currentDropPointIndex;
   final int dpLength;
-  final String userFcmToken;
 
   UpdateStatusButton({
     Key key,
     @required this.status,
-    @required this.orderId,
     @required this.currentDropPointIndex,
     @required this.dpLength,
-    @required this.userFcmToken,
   }) : super(key: key);
 
   final style = TextStyle(
@@ -238,7 +285,6 @@ class UpdateStatusButton extends StatelessWidget {
                     "Mark arrived pick up?",
                     () => task.invokeSendNotifications(
                       "Courier have arrived your pick up",
-                      userFcmToken,
                       toUpdateStatus: DeliveryStatus.StartDeliveryTask,
                     ),
                   );
@@ -250,8 +296,36 @@ class UpdateStatusButton extends StatelessWidget {
             case DeliveryStatus.StartDeliveryTask:
               return RaisedButton(
                 onPressed: () {
+                  if (!task.addedPayment) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (_) => Theme(
+                        data: ThemeData(
+                          colorScheme: ColorScheme.light().copyWith(
+                            primary: Constant.primaryColor,
+                          ),
+                        ),
+                        child: AlertDialog(
+                          title: Text("Alert"),
+                          content: Text(
+                              "Be sure collected cash payment from user before start the delivery task."),
+                          actions: [
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.of(_).pop();
+                              },
+                              child: Text('OK'),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+
+                    return;
+                  }
                   task.showConfirmationDialog(_, "Start the delivery task?",
-                      () => task.updateDeliveryStatus(orderId, 1));
+                      () => task.updateDeliveryStatus(1));
                 },
                 color: Constant.primaryColor,
                 child: Text('Start Delivery Task', style: style),
@@ -261,21 +335,18 @@ class UpdateStatusButton extends StatelessWidget {
               return RaisedButton(
                 onPressed: () {
                   task.showConfirmationDialog(_, "Mark arrived a drop point?",
-                      () {
+                      () async {
                     if (currentDropPointIndex + 1 >= dpLength) {
-                      return task.invokeSendNotifications(
+                      return await task.invokeSendNotifications(
                         "Courier have arrived a drop point",
-                        userFcmToken,
                         toUpdateStatus: DeliveryStatus.CompleteDelivery,
                       );
                     } else {
                       // indicate move on to next dp
                       task.notifyNextDropPoint();
 
-                      return task.invokeSendNotifications(
-                        "Courier have arrived a drop point",
-                        userFcmToken,
-                      );
+                      return await task.invokeSendNotifications(
+                          "Courier have arrived a drop point");
                     }
                   });
                 },
@@ -285,8 +356,7 @@ class UpdateStatusButton extends StatelessWidget {
               break;
             case DeliveryStatus.CompleteDelivery:
               return RaisedButton(
-                onPressed: () =>
-                    task.updateDeliveryStatus(orderId, 2, context: _),
+                onPressed: () => task.updateDeliveryStatus(2, context: _),
                 color: Constant.primaryColor,
                 child: Text('Mark Complete Delivery', style: style),
               );

@@ -6,8 +6,6 @@ class PaymentModel {
   final int orderId;
   final int userId;
   final int courierId;
-  final int paymentMethod = 0;
-  final int courierPaymentStatus = 0;
 
   PaymentModel({
     @required this.amount,
@@ -16,4 +14,12 @@ class PaymentModel {
     @required this.courierId,
     @required this.userId,
   });
+
+  Map toMap() => {
+        'amount': amount,
+        'courier_pay': courierPay,
+        'order_id': orderId,
+        'user_id': userId,
+        'courier_id': courierId,
+      };
 }

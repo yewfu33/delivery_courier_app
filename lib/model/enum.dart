@@ -1,10 +1,10 @@
 enum VehicleType { Bike, Car, Lorry }
 
 enum DeliveryStatus {
-  MarkArrivedPickUp,
-  StartDeliveryTask,
-  MarkArrivedDropPoint,
-  CompleteDelivery
+  MarkArrivedPickUp, // 0
+  StartDeliveryTask, // 1
+  MarkArrivedDropPoint, // 2
+  CompleteDelivery //3
 }
 
 extension NameExtension on VehicleType {
