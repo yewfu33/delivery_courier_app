@@ -1,20 +1,20 @@
-enum VehicleType { Bike, Car, Lorry }
+enum VehicleType { bike, car, lorry }
 
 enum DeliveryStatus {
-  MarkArrivedPickUp, // 0
-  StartDeliveryTask, // 1
-  MarkArrivedDropPoint, // 2
-  CompleteDelivery //3
+  markArrivedPickUp, // 0
+  startDeliveryTask, // 1
+  markArrivedDropPoint, // 2
+  completeDelivery //3
 }
 
 extension NameExtension on VehicleType {
   String get name {
     switch (this) {
-      case VehicleType.Bike:
+      case VehicleType.bike:
         return 'MotorBike';
-      case VehicleType.Car:
+      case VehicleType.car:
         return 'Car';
-      case VehicleType.Lorry:
+      case VehicleType.lorry:
         return 'Lorry';
       default:
         return '';

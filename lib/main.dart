@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 
 import 'model/user.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // obtain .env variables
@@ -48,14 +48,14 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final UserProvider auth = Provider.of<UserProvider>(context, listen: false);
+    final UserProvider auth = Provider.of<UserProvider>(context);
 
     return StreamBuilder(
       stream: auth.validateAuthState(),
       builder: (_, AsyncSnapshot<User> snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(child: Text("Something went wrong")),
           );
         }
@@ -63,17 +63,17 @@ class MyHomePage extends StatelessWidget {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           switch (auth.status) {
-            case Status.Uninitialized:
+            case Status.uninitialized:
               // show loading
               return const SplashScreen();
 
-            case Status.Unauthenticated:
+            case Status.unauthenticated:
               return LandingPage();
 
-            case Status.Authenticating:
+            case Status.authenticating:
               return LoginPage();
 
-            case Status.Authenticated:
+            case Status.authenticated:
               return ChangeNotifierProvider.value(
                 value: AppProvider.user(
                   user: snapshot.data,

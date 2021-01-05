@@ -5,8 +5,8 @@ class UserModel {
   final String fcmToken;
 
   UserModel.fromJson(Map<String, dynamic> json)
-      : userId = json['user_id'],
-        name = json['name'],
-        phoneNum = json['phone_num'],
-        fcmToken = json['fcm_token'];
+      : userId = json['user_id'] as int,
+        name = json['name'] as String,
+        phoneNum = json['phone_num'] as String,
+        fcmToken = json['fcm_token'] as String;
 }

@@ -10,11 +10,11 @@ class User {
   User();
 
   User.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        name = json['name'],
-        phoneNum = json['phone_num'],
-        email = json['email'],
-        profilePic = json['profile_pic'],
-        token = json['token'],
-        onBoard = json['onBoard'];
+      : id = json['id'] as int,
+        name = json['name'] as String,
+        phoneNum = json['phone_num'] as String,
+        email = json['email'] as String,
+        profilePic = json['profile_pic'] as String,
+        token = json['token'] as String,
+        onBoard = json['onBoard'] as bool;
 }

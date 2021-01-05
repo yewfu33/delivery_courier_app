@@ -17,9 +17,7 @@ class LandingPage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Container(
-                  child: SliderView(slide: slideItems),
-                ),
+                child: SliderView(slide: slideItems),
               ),
               SizedBox(
                 width: double.infinity,
@@ -31,15 +29,15 @@ class LandingPage extends StatelessWidget {
                       RegistrationPage(),
                     );
                   },
-                  child: Text(
+                  color: Constant.primaryColor,
+                  child: const Text(
                     'Registration Now',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       letterSpacing: 0.4,
                     ),
                   ),
-                  color: Constant.primaryColor,
                 ),
               ),
               const SizedBox(height: 10),
@@ -54,9 +52,9 @@ class LandingPage extends StatelessWidget {
                   onPressed: () {
                     changeScreen(context, LoginPage());
                   },
-                  child: Text(
+                  child: const Text(
                     'Account Log In',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       letterSpacing: 0.4,
                     ),

@@ -19,18 +19,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final List vehicleTypeItem = <DropdownMenuItem<int>>[
+  final List<DropdownMenuItem<int>> vehicleTypeItem = <DropdownMenuItem<int>>[
     DropdownMenuItem(
-      child: Text(VehicleType.Bike.name),
-      value: VehicleType.Bike.index,
+      value: VehicleType.bike.index,
+      child: Text(VehicleType.bike.name),
     ),
     DropdownMenuItem(
-      child: Text(VehicleType.Car.name),
-      value: VehicleType.Car.index,
-    ),
-    DropdownMenuItem(
-      child: Text(VehicleType.Lorry.name),
-      value: VehicleType.Lorry.index,
+      value: VehicleType.car.index,
+      child: Text(VehicleType.car.name),
     ),
   ];
 
@@ -64,7 +60,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registration'),
+        title: const Text('Registration'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -78,9 +74,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 child: CircleAvatar(
                   radius: 40,
                   // backgroundColor: Color(Constant.primaryColor),
-                  backgroundImage: model.pImage == null
-                      ? AssetImage('assets/img/avatar.jpg')
-                      : FileImage(model.pImage),
+                  backgroundImage: (model.pImage == null)
+                      ? const AssetImage('assets/img/avatar.jpg')
+                      : FileImage(model.pImage) as ImageProvider,
                   // child: Icon(Icons.camera_alt),
                 ),
               ),
@@ -101,7 +97,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         onSaved: (value) {
                           model.registrationModel.name = value;
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Name',
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -127,7 +123,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           CustomPhoneNumberFormatter(),
                         ],
                         keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Phone Number',
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -146,7 +142,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           model.registrationModel.email = value;
                         },
                         keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Email',
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -158,11 +154,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         items: vehicleTypeItem,
                         validator: (value) =>
                             value == null ? 'This field is required' : null,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Owned Vehicle Type',
                           contentPadding: EdgeInsets.zero,
                         ),
-                        onChanged: (value) {
+                        onChanged: (int value) {
                           model.registrationModel.vehicleType = value;
                         },
                       ),
@@ -179,7 +175,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         onSaved: (value) {
                           model.registrationModel.vehiclePlateNo = value;
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Vehicle Plate No',
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -209,7 +205,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       }
                     },
                     color: Constant.primaryColor,
-                    child: Text(
+                    child: const Text(
                       'Next',
                       style: TextStyle(
                         fontSize: 16,
@@ -242,7 +238,7 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Your Document'),
+        title: const Text('Upload Your Document'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -251,7 +247,7 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
             children: [
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
+                  child: const Text(
                     'Please upload your documents as below',
                     style: TextStyle(
                       fontSize: 23,
@@ -284,8 +280,8 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 70.0),
-                child: (_isPosting)
-                    ? Center(
+                child: _isPosting
+                    ? const Center(
                         child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 Constant.primaryColor)),
@@ -307,14 +303,14 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
                                 context: context,
                                 builder: (_) {
                                   return AlertDialog(
-                                    content: Text(
+                                    content: const Text(
                                         "Please upload the required documents"),
                                     actions: <Widget>[
                                       FlatButton(
-                                        child: Text('OK'),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
+                                        child: const Text('OK'),
                                       )
                                     ],
                                   );
@@ -323,7 +319,7 @@ class _UploadDocumentPageState extends State<UploadDocumentPage> {
                             }
                           },
                           color: Constant.primaryColor,
-                          child: Text(
+                          child: const Text(
                             'Submit',
                             style: TextStyle(
                               fontSize: 16,
@@ -362,44 +358,40 @@ class DocumentSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             flex: 4,
             child: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
           Expanded(
-            flex: 1,
             child: IconButton(
-              icon: Icon(Icons.add_photo_alternate),
+              icon: const Icon(Icons.add_photo_alternate),
               iconSize: 30,
               onPressed: photoCallback,
             ),
           ),
           Expanded(
-            flex: 1,
             child: IconButton(
-              icon: Icon(Icons.add_a_photo),
+              icon: const Icon(Icons.add_a_photo),
               iconSize: 30,
               onPressed: cameraCallback,
             ),
           ),
           Expanded(
-              flex: 1,
-              child: !checked
-                  ? Icon(Icons.check_box_outline_blank, size: 30)
-                  : Icon(
-                      Icons.check_box,
-                      size: 30,
-                      color: Colors.green,
-                    )),
+            child: !checked
+                ? const Icon(Icons.check_box_outline_blank, size: 30)
+                : const Icon(
+                    Icons.check_box,
+                    size: 30,
+                    color: Colors.green,
+                  ),
+          ),
         ],
       ),
     );

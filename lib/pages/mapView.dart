@@ -19,14 +19,15 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final OrderModel order = ModalRoute.of(context).settings.arguments;
+    final OrderModel order =
+        ModalRoute.of(context).settings.arguments as OrderModel;
 
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
         title: Text('Order #${order.orderId}'),
         actions: [
-          IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
       body: ChangeNotifierProvider.value(
@@ -43,10 +44,7 @@ class MapView extends StatelessWidget {
                 return Positioned.fill(
                   bottom: MediaQuery.of(context).size.height * 0.4,
                   child: GoogleMap(
-                    mapType: MapType.normal,
                     myLocationEnabled: true,
-                    compassEnabled: true,
-                    rotateGesturesEnabled: true,
                     markers: map.markers,
                     polylines: map.poly,
                     initialCameraPosition: CameraPosition(

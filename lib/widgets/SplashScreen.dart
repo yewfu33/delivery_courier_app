@@ -10,10 +10,10 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(
-          valueColor: new AlwaysStoppedAnimation<Color>(Constant.primaryColor),
+          valueColor: AlwaysStoppedAnimation<Color>(Constant.primaryColor),
         ),
       ),
     );

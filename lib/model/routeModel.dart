@@ -21,8 +21,8 @@ class Distance {
   int value;
 
   Distance.fromMap(Map data) {
-    text = data["text"];
-    value = data["value"];
+    text = data["text"] as String;
+    value = data["value"] as int;
   }
 }
 
@@ -31,7 +31,7 @@ class TimeNeeded {
   int value;
 
   TimeNeeded.fromMap(Map data) {
-    text = data["text"];
-    value = data["value"];
+    text = data["text"] as String;
+    value = data["value"] as int;
   }
 }

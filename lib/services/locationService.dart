@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:delivery_courier_app/model/locationModel.dart';
 import 'package:location/location.dart';
-import 'package:signalr_client/errors.dart';
 import 'package:signalr_client/signalr_client.dart';
+
+import '../constant.dart';
 
 class LocationService {
   static final LocationService _singleton = LocationService._init();
@@ -12,19 +12,19 @@ class LocationService {
   // register sigleton instance
   factory LocationService() => _singleton;
 
-  final Location _location = new Location();
+  final Location _location = Location();
   // HubConnection instance
   final HubConnection hubConnection =
       HubConnectionBuilder().withUrl(trackingHub).build();
 
-  static final trackingHub = "http://192.168.0.131:57934/tracking";
+  static const trackingHub = "${Constant.serverName}tracking";
 
-  static final sendLocationName = "LatLngToServer";
+  static const sendLocationName = "LatLngToServer";
 
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
 
-  StreamController<LocationModel> _locationController =
+  final StreamController<LocationModel> _locationController =
       StreamController<LocationModel>.broadcast();
 
   Stream<LocationModel> get locationStream => _locationController.stream;
@@ -32,15 +32,14 @@ class LocationService {
   StreamSubscription onLocationStreamSubscription;
 
   LocationService._init() {
-    this.init();
+    // initialize
+    init();
     try {
       hubConnection.start().catchError((e) => throw e);
 
       hubConnection.on("OnHubConnected", (List parameters) {
         print('${parameters[0]}');
       });
-    } on SocketException catch (e) {
-      print("socket exception in \"hub start\" ${e.toString()}");
     } catch (e) {
       print(e.toString());
     }
@@ -85,10 +84,8 @@ class LocationService {
         location.longitude,
         userId,
       ]);
-    } on GeneralError catch (e) {
-      print('error in send. ' + e.toString());
     } catch (e) {
-      print('error in send, ' + e.toString());
+      print('error in send, $e');
     }
   }
 

@@ -19,13 +19,12 @@ class PickUpSection extends StatelessWidget {
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14.0),
             child: Text(
               'Pickup Location',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Constant.primaryColor,
                 letterSpacing: 0.4,
                 fontSize: 17,
@@ -35,11 +34,10 @@ class PickUpSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Stepper(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controlsBuilder: (BuildContext context,
                     {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
                 Container(),
-            currentStep: 0,
             onStepTapped: (index) {
               model.onTapPickUpLocation();
             },
@@ -64,16 +62,17 @@ class PickUpSection extends StatelessWidget {
                     children: [
                       Text('+60${order.contact}'),
                       const SizedBox(height: 3),
-                      (order.comment.isNotEmpty)
-                          ? Text(order.comment)
-                          : SizedBox.shrink(),
+                      if (order.comment.isNotEmpty)
+                        Text(order.comment)
+                      else
+                        const SizedBox.shrink(),
                       Padding(
                         padding: const EdgeInsets.only(top: 6.0),
                         child: Row(
-                          children: <Widget>[
-                            const FaIcon(FontAwesomeIcons.wallet),
-                            const SizedBox(width: 6),
-                            const Text('Payment at this address'),
+                          children: const [
+                            FaIcon(FontAwesomeIcons.wallet),
+                            SizedBox(width: 6),
+                            Text('Payment at this address'),
                           ],
                         ),
                       ),

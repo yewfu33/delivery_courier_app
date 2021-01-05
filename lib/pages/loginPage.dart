@@ -28,10 +28,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    UserProvider model = Provider.of<UserProvider>(context, listen: false);
+    final UserProvider model =
+        Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: const Text('Login')),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -87,14 +88,14 @@ class _LoginPageState extends State<LoginPage> {
                     child: FlatButton(
                       onPressed: () {},
                       textColor: Constant.primaryColor,
-                      child: Text('RESET PASSWORD'),
+                      child: const Text('RESET PASSWORD'),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
-                  child: (isPosting)
-                      ? Center(
+                  child: isPosting
+                      ? const Center(
                           child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
                                   Constant.primaryColor)),
@@ -107,7 +108,6 @@ class _LoginPageState extends State<LoginPage> {
                               FocusScope.of(context).unfocus();
 
                               if (validateForm()) {
-                                print('valid form');
                                 // set posting loading true
                                 setState(() {
                                   isPosting = true;
@@ -118,14 +118,12 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() {
                                   isPosting = false;
                                 });
-                              } else {
-                                print('invalid form');
                               }
                             },
                             color: Constant.primaryColor,
-                            child: Text(
+                            child: const Text(
                               'Log-in',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 letterSpacing: 0.4,
                                 color: Colors.white,

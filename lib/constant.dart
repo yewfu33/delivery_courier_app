@@ -5,5 +5,5 @@ class Constant {
   static const String orderPath = 'api/orders';
   static const String accountPath = 'api/couriers';
   static const String imagePath = 'uploads/profile/';
-  static const Color primaryColor = const Color(0xFFD50000);
+  static const Color primaryColor = Color(0xFFD50000);
 }

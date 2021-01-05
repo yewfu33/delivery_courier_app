@@ -31,12 +31,12 @@ class CustomPhoneNumberFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    final String newText = '+60 ';
+    const String newText = '+60 ';
 
     if (newValue.selection.baseOffset < 4) {
       return newValue.copyWith(
         text: newText,
-        selection: new TextSelection.collapsed(offset: newText.length),
+        selection: const TextSelection.collapsed(offset: newText.length),
       );
     }
 

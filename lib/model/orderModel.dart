@@ -22,29 +22,32 @@ class OrderModel {
   final UserModel user;
 
   OrderModel.fromJson(Map<String, dynamic> json)
-      : orderId = json['order_id'],
-        name = json['name'],
-        address = json['pick_up_address'],
-        latitude = json['latitude'],
-        longitude = json['longitude'],
-        weight = json['weight'],
-        comment = json['comment'],
-        contact = json['contact_num'],
-        dateTime = DateTime.parse(json['pick_up_datetime']),
-        price = json['price'],
-        status = DeliveryStatus.values[json['delivery_status']],
-        vehicleType = json['vehicle_type'],
-        createdAt = DateTime.parse(json['created_at']),
-        userId = json['user_id'],
-        user = UserModel.fromJson(json['user']),
-        dropPoint = List<DropPointModel>.from(json['drop_points']
-            .map((dp) => DropPointModel.fromJson(dp))
-            .toList());
+      : orderId = json['order_id'] as int,
+        name = json['name'] as String,
+        address = json['pick_up_address'] as String,
+        latitude = json['latitude'] as double,
+        longitude = json['longitude'] as double,
+        weight = json['weight'] as double,
+        comment = json['comment'] as String,
+        contact = json['contact_num'] as String,
+        dateTime = DateTime.parse(json['pick_up_datetime'] as String),
+        price = json['price'] as double,
+        status = DeliveryStatus.values[json['delivery_status'] as int],
+        vehicleType = json['vehicle_type'] as int,
+        createdAt = DateTime.parse(json['created_at'] as String),
+        userId = json['user_id'] as int,
+        user = UserModel.fromJson(json['user'] as Map<String, dynamic>),
+        dropPoint = List.from(json['drop_points'] as List)
+            .map((dp) => DropPointModel.fromJson(dp as Map<String, dynamic>))
+            .toList();
 
   Map toMap() {
-    List<Map> dp = this.dropPoint != null
-        ? this.dropPoint.map((i) => i.toMap()).toList()
-        : null;
+    List<Map> dp;
+    if (dropPoint != null) {
+      dp = dropPoint.map((i) => i.toMap()).toList();
+    } else {
+      dp = null;
+    }
 
     return {
       'order_id': orderId,

@@ -32,7 +32,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
             padding: const EdgeInsets.symmetric(horizontal: 14.0),
             child: Text(
               'Drop Off Location (${widget.dp.length})',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Constant.primaryColor,
                 letterSpacing: 0.4,
                 fontSize: 17,
@@ -42,7 +42,7 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
           ),
           const SizedBox(height: 10),
           Stepper(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controlsBuilder: (_,
                     {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
                 Container(),
@@ -74,9 +74,10 @@ class _DropOffLocationSectionState extends State<DropOffLocationSection> {
                       children: [
                         Text('+60${widget.dp[i].contact}'),
                         const SizedBox(height: 3),
-                        (widget.dp[i].comment.isNotEmpty)
-                            ? Text(widget.dp[i].comment)
-                            : SizedBox.shrink(),
+                        if (widget.dp[i].comment.isNotEmpty)
+                          Text(widget.dp[i].comment)
+                        else
+                          const SizedBox.shrink(),
                       ],
                     ),
                   ),

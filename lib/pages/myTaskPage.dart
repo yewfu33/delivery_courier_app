@@ -18,20 +18,19 @@ class MyTaskPage extends StatelessWidget {
 
     return DefaultTabController(
       length: 3,
-      initialIndex: 0,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('My Tasks'),
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(
-                child: Text('Active', style: const TextStyle(fontSize: 16)),
+                child: Text('Active', style: TextStyle(fontSize: 16)),
               ),
               Tab(
-                child: Text('Completed', style: const TextStyle(fontSize: 16)),
+                child: Text('Completed', style: TextStyle(fontSize: 16)),
               ),
               Tab(
-                child: Text('Cancelled', style: const TextStyle(fontSize: 16)),
+                child: Text('Cancelled', style: TextStyle(fontSize: 16)),
               ),
             ],
             indicatorColor: Colors.white,
@@ -62,12 +61,11 @@ class EmptyTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.expand(),
+      constraints: const BoxConstraints.expand(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          const Expanded(child: const SizedBox(), flex: 2),
+          const Expanded(flex: 2, child: SizedBox()),
           SizedBox(
             width: 50.0,
             height: 60.0,
@@ -81,7 +79,7 @@ class EmptyTask extends StatelessWidget {
             'No task found',
             style: TextStyle(fontSize: 14.0, color: Colors.grey[500]),
           ),
-          const Expanded(child: const SizedBox(), flex: 3),
+          const Expanded(flex: 3, child: SizedBox()),
         ],
       ),
     );
@@ -114,13 +112,13 @@ class _TaskListState extends State<TaskList> {
   }
 
   Future<List<OrderModel>> fetchTasks() async {
-    String query = [
+    final String query = [
       'status=${widget.status}',
     ].join('&');
 
     try {
-      http.Response res = await http.post(
-        path + widget.user.id.toString() + '?$query',
+      final http.Response res = await http.post(
+        '$path${widget.user.id}${'?$query'}',
         headers: {
           'Authorization': 'Bearer ${widget.user.token}',
         },
@@ -132,30 +130,31 @@ class _TaskListState extends State<TaskList> {
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
   }
 
   List<OrderModel> _setOrderModel(String jsonBody) {
-    var body = json.decode(jsonBody);
-    return body.map<OrderModel>((e) => OrderModel.fromJson(e)).toList();
+    final List body = json.decode(jsonBody) as List;
+    return body
+        .map<OrderModel>((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<OrderModel>>(
-      initialData: [],
+      initialData: const [],
       future: _orders,
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: Loading());
         }
 
-        if (!snapshot.hasData || snapshot.data.length == 0) return EmptyTask();
+        if (!snapshot.hasData || snapshot.data.isEmpty) return EmptyTask();
 
         return ListView.separated(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 12),
           itemCount: snapshot.data.length,
           itemBuilder: (_, i) {

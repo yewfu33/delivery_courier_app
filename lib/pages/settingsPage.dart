@@ -15,9 +15,9 @@ class SettingsPage extends StatelessWidget {
     const Widget _rightArrow = Icon(Icons.chevron_right, size: 26);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: const Text('Settings')),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: ListView(
           shrinkWrap: true,
           children: [
@@ -27,26 +27,20 @@ class SettingsPage extends StatelessWidget {
               },
               leading: CircleAvatar(
                 radius: 22,
-                backgroundImage: user.profilePic?.isEmpty ?? true
-                    ? AssetImage('assets/img/avatar.jpg')
+                backgroundImage: (user.profilePic?.isEmpty ?? true)
+                    ? const AssetImage('assets/img/avatar.jpg')
                     : CachedNetworkImageProvider(Constant.serverName +
                         Constant.imagePath +
-                        user.profilePic),
+                        user.profilePic) as ImageProvider,
               ),
               title: Text(user.name),
-              subtitle: Text('online'),
+              subtitle: const Text('click to enter profile'),
               trailing: IconButton(
                 onPressed: () {},
                 icon: _rightArrow,
               ),
             ),
             const Divider(),
-            const SettingsListTile(
-              rightArrow: _rightArrow,
-              icon: Icons.drive_eta,
-              title: 'Vehicle Management',
-              bgColor: Constant.primaryColor,
-            ),
             const SettingsListTile(
               rightArrow: _rightArrow,
               icon: Icons.notifications,

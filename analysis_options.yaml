@@ -1,0 +1,10 @@
+include: package:lint/analysis_options.yaml
+
+linter:
+  rules:
+    file_names: false
+    avoid_setters_without_getters: false
+
+analyzer:
+  errors:
+    avoid_print: ignore

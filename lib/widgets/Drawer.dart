@@ -32,22 +32,21 @@ class MyDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 25,
-                    backgroundImage: user.profilePic?.isEmpty ?? true
-                        ? AssetImage('assets/img/avatar.jpg')
+                    backgroundImage: (user.profilePic?.isEmpty ?? true)
+                        ? const AssetImage('assets/img/avatar.jpg')
                         : CachedNetworkImageProvider(Constant.serverName +
                             Constant.imagePath +
-                            user.profilePic),
+                            user.profilePic) as ImageProvider,
                   ),
                   Container(
                     padding: const EdgeInsets.only(left: 10),
                     child: Column(
-                      mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           user.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 16.5),
                         ),
                         const SizedBox(height: 2.5),
@@ -88,10 +87,10 @@ class MyDrawer extends StatelessWidget {
               text: "My Task",
               leading: const FaIcon(FontAwesomeIcons.history),
             ),
-            DrawerListTile(
+            const DrawerListTile(
               onTap: null,
               text: "Earnings",
-              leading: const FaIcon(FontAwesomeIcons.wallet),
+              leading: FaIcon(FontAwesomeIcons.wallet),
             ),
             DrawerListTile(
               onTap: () {
@@ -108,9 +107,8 @@ class MyDrawer extends StatelessWidget {
             ),
             ListTile(
               title: FlatButton(
-                onPressed: () async {
-                  await Provider.of<UserProvider>(context, listen: false)
-                      .signOut();
+                onPressed: () {
+                  Provider.of<UserProvider>(context, listen: false).signOut();
                 },
                 child: const Text('logout'),
               ),

@@ -12,7 +12,7 @@ import '../constant.dart';
 class AppProvider extends ChangeNotifier {
   Future<List<OrderModel>> _orders;
 
-  get orders => _orders;
+  Future<List<OrderModel>> get orders => _orders;
 
   final User user;
 
@@ -20,23 +20,21 @@ class AppProvider extends ChangeNotifier {
 
   Stream<List<OrderModel>> ordersStream() async* {
     try {
-      var res = await getAllOrders();
+      final res = await getAllOrders();
 
       if (res.statusCode == 200) {
         yield _setOrderModel(res.body);
       } else {
-        print(res.body);
         yield null;
       }
     } catch (e) {
-      print(e);
-      yield null;
+      rethrow;
     }
   }
 
   Future<http.Response> getAllOrders() async {
     try {
-      var res = await http.get(
+      final res = await http.get(
         Constant.serverName + Constant.orderPath,
         headers: {
           'Content-type': 'application/json',
@@ -45,10 +43,7 @@ class AppProvider extends ChangeNotifier {
       );
 
       return res;
-    } on SocketException catch (e) {
-      print(
-          "socket exception in \"${Constant.serverName + Constant.orderPath}\", " +
-              e.toString());
+    } on SocketException {
       throw Exception('failed to fetch pick order');
     } catch (e) {
       throw Exception('failed to fetch pick order');
@@ -56,24 +51,23 @@ class AppProvider extends ChangeNotifier {
   }
 
   List<OrderModel> _setOrderModel(String jsonBody) {
-    var body = json.decode(jsonBody);
-    return body.map<OrderModel>((e) => OrderModel.fromJson(e)).toList();
+    final List body = json.decode(jsonBody) as List;
+    return body
+        .map<OrderModel>((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<OrderModel>> fetchOrders() async {
     try {
-      http.Response res = await getAllOrders();
+      final http.Response res = await getAllOrders();
       if (res == null) throw Exception('failed to fetch pick order');
-      print(res.statusCode.toString());
 
       if (res.statusCode == 200) {
         return _setOrderModel(res.body);
       } else {
-        print(res.body);
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
   }
@@ -85,19 +79,19 @@ class AppProvider extends ChangeNotifier {
       barrierDismissible: true,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
         child: AlertDialog(
-          title: Text("Error occured"),
+          title: const Text("Error occured"),
           content: Text(message),
           actions: [
             FlatButton(
               onPressed: () {
                 popScreen(_);
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             )
           ],
         ),
@@ -106,13 +100,14 @@ class AppProvider extends ChangeNotifier {
   }
 
   static void openCustomDialog(
-      BuildContext context, String title, String content, bool isPop) {
+      BuildContext context, String title, String content,
+      {bool isPop}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
@@ -133,7 +128,7 @@ class AppProvider extends ChangeNotifier {
                         .pushNamedAndRemoveUntil('/', (route) => false);
                   }
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               )
             ],
           ),

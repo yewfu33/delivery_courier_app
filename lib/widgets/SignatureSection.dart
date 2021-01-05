@@ -10,16 +10,16 @@ class SignaturesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Column(
         children: [
           GreyBoxContainer(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+              children: const [
                 Text(
                   'Signatures',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
@@ -31,7 +31,7 @@ class SignaturesSection extends StatelessWidget {
           const SizedBox(height: 14),
           Wrap(
             alignment: WrapAlignment.center,
-            children: [
+            children: const [
               Text('No Signature yet'),
             ],
           ),

@@ -59,7 +59,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         'Authorization': 'Bearer ${widget.user.token}'
       };
 
-      http.Response result = await http.post(
+      final http.Response result = await http.post(
         Constant.serverName + Constant.accountPath + changePasswordPath,
         body: json.encode(body),
         headers: jwtHeader,
@@ -68,16 +68,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       if (result.statusCode == 200) {
         return true;
       } else {
-        Map<String, dynamic> body = json.decode(result.body);
+        final Map<String, dynamic> body =
+            json.decode(result.body) as Map<String, dynamic>;
 
         if (body["message"] != null) {
-          AppProvider.openCustomDialog(context, "Error", body["message"], true);
+          AppProvider.openCustomDialog(
+              context, "Error", body["message"] as String,
+              isPop: true);
         }
 
         return false;
       }
     } catch (e) {
-      print(e);
       // show retry dialog
       AppProvider.showRetryDialog(context);
       return false;
@@ -95,7 +97,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     final UserProvider model = context.watch<UserProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Reset Password')),
+      appBar: AppBar(title: const Text('Reset Password')),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -104,41 +106,43 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             autovalidate: _autoValidateForm,
             child: Column(
               children: [
-                (widget.title.isNotEmpty)
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Text(
-                          widget.title,
-                          style: const TextStyle(
-                            fontSize: 23,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                    : SizedBox.shrink(),
-                (widget.title.isEmpty)
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 15.0),
-                        child: TextFormField(
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          validator: (value) {
-                            if (value.trim().isEmpty) {
-                              return 'This field is required.';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            oldPassword = value;
-                          },
-                          decoration: const InputDecoration(
-                            hintText: 'Old Password',
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      )
-                    : SizedBox.shrink(),
+                if (widget.title.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
+                if (widget.title.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15.0),
+                    child: TextFormField(
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      validator: (value) {
+                        if (value.trim().isEmpty) {
+                          return 'This field is required.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        oldPassword = value;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: 'Old Password',
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 15.0),
                   child: TextFormField(
@@ -187,8 +191,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
-                  child: (isPosting)
-                      ? Center(
+                  child: isPosting
+                      ? const Center(
                           child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
                                   Constant.primaryColor)),
@@ -201,12 +205,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               FocusScope.of(context).unfocus();
 
                               if (_validateForm()) {
-                                print('valid form');
                                 // set posting loading true
                                 setState(() => isPosting = true);
 
                                 // send the form
-                                var success = await onSubmit(context);
+                                final success = await onSubmit(context);
 
                                 if (success) {
                                   // set user in prefs
@@ -219,8 +222,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 }
 
                                 setState(() => isPosting = false);
-                              } else {
-                                print('invalid form');
                               }
                             },
                             color: Constant.primaryColor,

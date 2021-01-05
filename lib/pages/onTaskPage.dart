@@ -28,7 +28,7 @@ class OnTaskPage extends StatefulWidget {
 }
 
 class _OnTaskPageState extends State<OnTaskPage> {
-  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -50,24 +50,24 @@ class _OnTaskPageState extends State<OnTaskPage> {
       barrierDismissible: true,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
         child: AlertDialog(
-          title: Text("Confirmation"),
-          content: Text("Cancel the delivery order?"),
+          title: const Text("Confirmation"),
+          content: const Text("Cancel the delivery order?"),
           actions: [
             FlatButton(
               onPressed: () => Navigator.of(_).pop(),
-              child: Text('NO'),
+              child: const Text('NO'),
             ),
             FlatButton(
               onPressed: () async {
                 await Provider.of<TaskProvider>(context, listen: false)
                     .cancelDeliveryOrder(_);
               },
-              child: Text('YES'),
+              child: const Text('YES'),
             )
           ],
         ),
@@ -97,12 +97,12 @@ class _OnTaskPageState extends State<OnTaskPage> {
             onSelected: (_) {
               showCancelOrderConfirmation(context);
             },
-            offset: Offset(0, 40),
+            offset: const Offset(0, 40),
             itemBuilder: (_) {
               return [
                 const PopupMenuItem(
                   value: true,
-                  child: const Text('Cancel Delivery Order'),
+                  child: Text('Cancel Delivery Order'),
                 ),
               ];
             },
@@ -147,9 +147,7 @@ class BackPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      mapType: MapType.normal,
       myLocationEnabled: true,
-      rotateGesturesEnabled: true,
       markers: map.markers,
       polylines: map.poly,
       initialCameraPosition: CameraPosition(
@@ -200,12 +198,11 @@ class Panel extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+                  children: const [
                     Text(
                       'Delivery Info',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -215,8 +212,6 @@ class Panel extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
                 child: GreyBoxContainer(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Icon(Icons.access_time),
                       const SizedBox(width: 8),
@@ -254,14 +249,14 @@ class UpdateStatusButton extends StatelessWidget {
   final int currentDropPointIndex;
   final int dpLength;
 
-  UpdateStatusButton({
+  const UpdateStatusButton({
     Key key,
     @required this.status,
     @required this.currentDropPointIndex,
     @required this.dpLength,
   }) : super(key: key);
 
-  final style = TextStyle(
+  static const style = TextStyle(
     color: Colors.white,
     fontSize: 16,
     letterSpacing: 1,
@@ -277,7 +272,7 @@ class UpdateStatusButton extends StatelessWidget {
       child: Builder(
         builder: (_) {
           switch (status) {
-            case DeliveryStatus.MarkArrivedPickUp:
+            case DeliveryStatus.markArrivedPickUp:
               return RaisedButton(
                 onPressed: () {
                   task.showConfirmationDialog(
@@ -285,15 +280,15 @@ class UpdateStatusButton extends StatelessWidget {
                     "Mark arrived pick up?",
                     () => task.invokeSendNotifications(
                       "Courier have arrived your pick up",
-                      toUpdateStatus: DeliveryStatus.StartDeliveryTask,
+                      toUpdateStatus: DeliveryStatus.startDeliveryTask,
                     ),
                   );
                 },
                 color: Constant.primaryColor,
-                child: Text('Mark Arrived Pickup', style: style),
+                child: const Text('Mark Arrived Pickup', style: style),
               );
               break;
-            case DeliveryStatus.StartDeliveryTask:
+            case DeliveryStatus.startDeliveryTask:
               return RaisedButton(
                 onPressed: () {
                   if (!task.addedPayment) {
@@ -302,20 +297,20 @@ class UpdateStatusButton extends StatelessWidget {
                       barrierDismissible: true,
                       builder: (_) => Theme(
                         data: ThemeData(
-                          colorScheme: ColorScheme.light().copyWith(
+                          colorScheme: const ColorScheme.light().copyWith(
                             primary: Constant.primaryColor,
                           ),
                         ),
                         child: AlertDialog(
-                          title: Text("Alert"),
-                          content: Text(
+                          title: const Text("Alert"),
+                          content: const Text(
                               "Be sure collected cash payment from user before start the delivery task."),
                           actions: [
                             FlatButton(
                               onPressed: () {
                                 Navigator.of(_).pop();
                               },
-                              child: Text('OK'),
+                              child: const Text('OK'),
                             )
                           ],
                         ),
@@ -328,41 +323,41 @@ class UpdateStatusButton extends StatelessWidget {
                       () => task.updateDeliveryStatus(1));
                 },
                 color: Constant.primaryColor,
-                child: Text('Start Delivery Task', style: style),
+                child: const Text('Start Delivery Task', style: style),
               );
               break;
-            case DeliveryStatus.MarkArrivedDropPoint:
+            case DeliveryStatus.markArrivedDropPoint:
               return RaisedButton(
                 onPressed: () {
                   task.showConfirmationDialog(_, "Mark arrived a drop point?",
                       () async {
                     if (currentDropPointIndex + 1 >= dpLength) {
-                      return await task.invokeSendNotifications(
+                      return task.invokeSendNotifications(
                         "Courier have arrived a drop point",
-                        toUpdateStatus: DeliveryStatus.CompleteDelivery,
+                        toUpdateStatus: DeliveryStatus.completeDelivery,
                       );
                     } else {
                       // indicate move on to next dp
                       task.notifyNextDropPoint();
 
-                      return await task.invokeSendNotifications(
+                      return task.invokeSendNotifications(
                           "Courier have arrived a drop point");
                     }
                   });
                 },
                 color: Constant.primaryColor,
-                child: Text('Mark Arrived DropPoint', style: style),
+                child: const Text('Mark Arrived DropPoint', style: style),
               );
               break;
-            case DeliveryStatus.CompleteDelivery:
+            case DeliveryStatus.completeDelivery:
               return RaisedButton(
                 onPressed: () => task.updateDeliveryStatus(2, context: _),
                 color: Constant.primaryColor,
-                child: Text('Mark Complete Delivery', style: style),
+                child: const Text('Mark Complete Delivery', style: style),
               );
               break;
             default:
-              return Text("error.");
+              return const Text("error.");
           }
         },
       ),
@@ -416,8 +411,6 @@ class UserInfoSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Icon(Icons.person),
                 const SizedBox(width: 10),
@@ -428,8 +421,6 @@ class UserInfoSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Icon(Icons.phone),
                 const SizedBox(width: 10),
@@ -440,9 +431,6 @@ class UserInfoSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
               children: [
                 const Icon(Icons.location_on),
                 const SizedBox(width: 10),
@@ -460,8 +448,6 @@ class UserInfoSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Icon(Icons.event_note),
                 const SizedBox(width: 10),
@@ -476,32 +462,30 @@ class UserInfoSection extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            child: Row(
-              children: [
-                Expanded(
-                  child: FlatButton.icon(
-                    onPressed: () {
-                      _makePhoneCall('tel:+60$phoneNum');
-                    },
-                    icon: const Icon(Icons.call),
-                    color: Colors.grey[300],
-                    label: Text('Call'),
-                  ),
+          Row(
+            children: [
+              Expanded(
+                child: FlatButton.icon(
+                  onPressed: () {
+                    _makePhoneCall('tel:+60$phoneNum');
+                  },
+                  icon: const Icon(Icons.call),
+                  color: Colors.grey[300],
+                  label: const Text('Call'),
                 ),
-                const VerticalDivider(),
-                Expanded(
-                  child: FlatButton.icon(
-                    onPressed: () {
-                      _launchMap(latLng.latitude, latLng.longitude);
-                    },
-                    icon: const Icon(Icons.near_me),
-                    color: Colors.grey[300],
-                    label: Text('Direction'),
-                  ),
-                )
-              ],
-            ),
+              ),
+              const VerticalDivider(),
+              Expanded(
+                child: FlatButton.icon(
+                  onPressed: () {
+                    _launchMap(latLng.latitude, latLng.longitude);
+                  },
+                  icon: const Icon(Icons.near_me),
+                  color: Colors.grey[300],
+                  label: const Text('Direction'),
+                ),
+              )
+            ],
           )
         ],
       ),

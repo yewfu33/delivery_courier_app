@@ -8,12 +8,15 @@ class RegistrationModel {
   String profilePictureName;
   int vehicleType;
   String vehiclePlateNo;
-  List<Document> documents = new List<Document>();
+  List<Document> documents = [];
 
   Map toMap() {
-    List<Map> d = this.documents != null
-        ? this.documents.map((i) => i.toMap()).toList()
-        : null;
+    List<Map> d;
+    if (documents != null) {
+      d = documents.map((i) => i.toMap()).toList();
+    } else {
+      d = null;
+    }
 
     return {
       'name': name,

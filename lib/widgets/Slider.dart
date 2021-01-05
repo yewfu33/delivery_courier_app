@@ -43,9 +43,7 @@ class SliderView extends StatefulWidget {
 }
 
 class _SliderViewState extends State<SliderView> {
-  PageController _sliderController = new PageController(
-    initialPage: 0,
-  );
+  final PageController _sliderController = PageController();
   int currentPage = 0;
 
   @override
@@ -61,7 +59,6 @@ class _SliderViewState extends State<SliderView> {
         Expanded(
           child: PageView.builder(
             controller: _sliderController,
-            scrollDirection: Axis.horizontal,
             itemCount: widget.slide.length,
             onPageChanged: (i) {
               setState(() {
@@ -75,7 +72,7 @@ class _SliderViewState extends State<SliderView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(widget.slide[i].image),
-                    Divider(color: Colors.transparent),
+                    const Divider(color: Colors.transparent),
                     Text(
                       widget.slide[i].title,
                       style: const TextStyle(
@@ -84,7 +81,7 @@ class _SliderViewState extends State<SliderView> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Divider(color: Colors.transparent),
+                    const Divider(color: Colors.transparent),
                     Text(
                       widget.slide[i].description,
                       textAlign: TextAlign.center,
@@ -103,9 +100,9 @@ class _SliderViewState extends State<SliderView> {
             children: [
               for (int j = 0; j < widget.slide.length; j++)
                 if (currentPage == j)
-                  SlideIndicator(isCurrent: true)
+                  const SlideIndicator(isCurrent: true)
                 else
-                  SlideIndicator(isCurrent: false)
+                  const SlideIndicator(isCurrent: false)
             ],
           ),
         ),

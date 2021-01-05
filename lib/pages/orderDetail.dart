@@ -5,7 +5,6 @@ import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/model/userModel.dart';
 import 'package:delivery_courier_app/pages/onTaskPage.dart';
-import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/mapProvider.dart';
 import 'package:delivery_courier_app/providers/taskProvider.dart';
 import 'package:delivery_courier_app/widgets/DropOffSection.dart';
@@ -62,7 +61,7 @@ class PickOrderDetail extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const Divider(color: Colors.transparent, height: 5),
-              if (order.status == DeliveryStatus.MarkArrivedPickUp)
+              if (order.status == DeliveryStatus.markArrivedPickUp)
                 ActionButton(
                   order: order,
                   user: user,
@@ -75,9 +74,9 @@ class PickOrderDetail extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "${DateFormat('dd MMM | h:mm a').format(order.dateTime)}",
+                      DateFormat('dd MMM | h:mm a').format(order.dateTime),
                       // 'Today at 11.42 pm',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Constant.primaryColor,
                         fontSize: 20.5,
                         fontWeight: FontWeight.w600,
@@ -85,12 +84,11 @@ class PickOrderDetail extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Row(
-                      mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
                         if (order.vehicleType == 0)
-                          FaIcon(FontAwesomeIcons.motorcycle, size: 20),
+                          const FaIcon(FontAwesomeIcons.motorcycle, size: 20),
                         if (order.vehicleType == 1)
-                          FaIcon(FontAwesomeIcons.car, size: 20),
+                          const FaIcon(FontAwesomeIcons.car, size: 20),
                         const SizedBox(width: 5),
                         Text(
                           '${setVehicleType(order.vehicleType)} (weight ${setWeightDisplay(order.weight.round())})',
@@ -104,7 +102,7 @@ class PickOrderDetail extends StatelessWidget {
                     const SizedBox(height: 7),
                     Text(
                       order.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.3,
@@ -118,19 +116,19 @@ class PickOrderDetail extends StatelessWidget {
               ),
               PriceSection(order: order),
               const Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                padding: EdgeInsets.symmetric(horizontal: 14.0),
                 child: Divider(color: Colors.black, height: 5),
               ),
               UserInfoSection(user: order.user),
               const Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: const Divider(color: Colors.black),
+                padding: EdgeInsets.symmetric(horizontal: 14.0),
+                child: Divider(color: Colors.black),
               ),
               //pickup location
               PickUpSection(order: order),
               const Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: const Divider(color: Colors.black),
+                padding: EdgeInsets.symmetric(horizontal: 14.0),
+                child: Divider(color: Colors.black),
               ),
               //drop off location
               DropOffLocationSection(dp: order.dropPoint),
@@ -161,13 +159,11 @@ class UserInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Container(
-        child: const CircleAvatar(
-          radius: 20,
-          child: Icon(
-            Icons.person,
-            size: 20,
-          ),
+      leading: const CircleAvatar(
+        radius: 20,
+        child: Icon(
+          Icons.person,
+          size: 20,
         ),
       ),
       title: Text(
@@ -223,25 +219,25 @@ class _ActionButtonState extends State<ActionButton> {
       barrierDismissible: true,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
         child: AlertDialog(
-          title: Text("Confirmation"),
-          content: Text("Take the order?"),
+          title: const Text("Confirmation"),
+          content: const Text("Take the order?"),
           actions: [
             FlatButton(
               onPressed: () {
                 Navigator.pop(_, false);
               },
-              child: Text('CANCEL'),
+              child: const Text('CANCEL'),
             ),
             FlatButton(
               onPressed: () {
                 Navigator.pop(_, true);
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -260,16 +256,16 @@ class _ActionButtonState extends State<ActionButton> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
-      child: (loading)
+      child: loading
           ? Loading()
           : (!widget.checkIsRestoreOnTaskPage)
               ? RaisedButton(
                   onPressed: () async {
-                    var confirmation = await openConfimationDialog(context);
+                    final confirmation = await openConfimationDialog(context);
 
                     if (confirmation ?? false) {
                       setState(() => loading = true);
-                      var isSuccessRegistered = await model.registerOrder(
+                      final isSuccessRegistered = await model.registerOrder(
                           context, widget.order.orderId, widget.user);
 
                       if (isSuccessRegistered) {
@@ -298,7 +294,7 @@ class _ActionButtonState extends State<ActionButton> {
                   color: Constant.primaryColor,
                   child: const Text(
                     'TAKE ORDER',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       letterSpacing: 0.4,
@@ -327,7 +323,7 @@ class _ActionButtonState extends State<ActionButton> {
                   color: Constant.primaryColor,
                   child: const Text(
                     'BACK TO TASK PAGE',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       letterSpacing: 0.4,

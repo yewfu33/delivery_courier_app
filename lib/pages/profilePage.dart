@@ -13,15 +13,15 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         actions: [
           FlatButton(
             onPressed: () {},
-            child: Text('Edit', style: TextStyle(color: Colors.white)),
+            child: const Text('Edit', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         child: Column(
           children: [
@@ -33,14 +33,14 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 44,
-                      backgroundImage: user.profilePic?.isEmpty ?? true
-                          ? AssetImage('assets/img/avatar.jpg')
+                      backgroundImage: (user.profilePic?.isEmpty ?? true)
+                          ? const AssetImage('assets/img/avatar.jpg')
                           : CachedNetworkImageProvider(Constant.serverName +
                               Constant.imagePath +
-                              user.profilePic),
+                              user.profilePic) as ImageProvider,
                     ),
                     const SizedBox(height: 5),
-                    const OnlineIndicator(),
+                    // const OnlineIndicator(),
                   ],
                 ),
               ),
@@ -55,7 +55,7 @@ class ProfilePage extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 15.0, bottom: 5),
                     child: Text(
                       'Information'.toUpperCase(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey,
@@ -97,13 +97,13 @@ class OnlineIndicator extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.green,
           ),
         ),
         const SizedBox(width: 4),
-        Text('Online'),
+        const Text('Online'),
       ],
     );
   }
@@ -121,13 +121,13 @@ class OfflineIndicator extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Constant.primaryColor,
           ),
         ),
         const SizedBox(width: 4),
-        Text('Offline'),
+        const Text('Offline'),
       ],
     );
   }
@@ -148,14 +148,14 @@ class ProfileListTile extends StatelessWidget {
     return ListTile(
       leading: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 15.5,
           fontWeight: FontWeight.w500,
         ),
       ),
       trailing: Text(
         value,
-        style: TextStyle(fontSize: 15.5),
+        style: const TextStyle(fontSize: 15.5),
       ),
     );
   }

@@ -18,7 +18,7 @@ class PriceSection extends StatelessWidget {
       barrierDismissible: true,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
@@ -44,8 +44,8 @@ class PriceSection extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Payment Method"),
+                children: const [
+                  Text("Payment Method"),
                   Text("Cash"),
                 ],
               ),
@@ -78,7 +78,6 @@ class PriceSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       width: double.infinity,
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -92,7 +91,7 @@ class PriceSection extends StatelessWidget {
                       fontSize: 13.5)),
               const SizedBox(height: 4),
               Text("RM ${order.price}",
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Constant.primaryColor,
                       fontWeight: FontWeight.w500,
                       fontSize: 20.5)),
@@ -100,7 +99,7 @@ class PriceSection extends StatelessWidget {
           ),
           FlatButton(
             onPressed: () {
-              showPricingDetails(context, order.price, (order.price * 0.8),
+              showPricingDetails(context, order.price, order.price * 0.8,
                   paymentStatus: "Pending");
             },
             textColor: Constant.primaryColor,

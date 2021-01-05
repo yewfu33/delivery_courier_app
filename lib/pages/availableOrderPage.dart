@@ -59,11 +59,10 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Center(
-                        child: const CircularProgressIndicator(
-                          valueColor: const AlwaysStoppedAnimation<Color>(
+                    children: const [
+                      Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
                               Constant.primaryColor),
                         ),
                       ),
@@ -74,21 +73,18 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                 if (snapshot.hasError) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [Center(child: Text(snapshot.error.toString()))],
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data.length == 0)
+                if (!snapshot.hasData || snapshot.data.isEmpty) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Center(
-                          child:
-                              const Text('No orders avaiable at the moment.'))
+                    children: const [
+                      Center(child: Text('No orders avaiable at the moment.'))
                     ],
                   );
+                }
 
                 // finally show the order list
                 return RefreshIndicator(
@@ -96,7 +92,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                     setState(() {});
                   },
                   child: ListView.separated(
-                    physics: AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
                         vertical: 13, horizontal: 12),
                     itemCount: snapshot.data.length,

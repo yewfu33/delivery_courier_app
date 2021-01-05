@@ -19,13 +19,13 @@ class MapProvider with ChangeNotifier {
   final double _zoomLevel = 17;
 
   LatLng origin;
-  List<LatLng> destination = List<LatLng>();
+  List<LatLng> destination = <LatLng>[];
 
-  Set<Marker> _markers = {};
+  final Set<Marker> _markers = {};
   Set<Polyline> _poly = {};
   RouteModel _routeModel;
-  List<LatLng> _polylineCoordinates = List();
-  List<RouteModel> _routeModelCollection = List();
+  final List<LatLng> _polylineCoordinates = [];
+  final List<RouteModel> _routeModelCollection = [];
 
   Set<Marker> get markers => _markers;
   Set<Polyline> get poly => _poly;
@@ -34,7 +34,7 @@ class MapProvider with ChangeNotifier {
   RouteModel get routeModel => _routeModel;
 
   MapProvider.init(LatLng a1, List<LatLng> a2) {
-    this.initRoute(a1, a2);
+    initRoute(a1, a2);
   }
 
   void onMapCreate(GoogleMapController controller) {
@@ -75,8 +75,6 @@ class MapProvider with ChangeNotifier {
       position: position,
     );
 
-    print('added marker: $markerIdVal');
-
     _markers.add(marker);
   }
 
@@ -88,7 +86,7 @@ class MapProvider with ChangeNotifier {
   Future _createPolylines(LatLng origin, List<LatLng> destination) async {
 // Generating the list of coordinates to be used for
     // drawing the polylines
-    RouteModel route =
+    final RouteModel route =
         await mapService.getRouteByCoordinates(origin, destination[0]);
 
     _routeModel = route;
@@ -106,7 +104,7 @@ class MapProvider with ChangeNotifier {
     if (destination.length > 1) {
       for (var i = 0; i < destination.length; i++) {
         if (i % 2 != 0) {
-          RouteModel r = await mapService.getRouteByCoordinates(
+          final RouteModel r = await mapService.getRouteByCoordinates(
               destination[i - 1], destination[i]);
 
           // append on the collection
@@ -137,12 +135,8 @@ class MapProvider with ChangeNotifier {
   Future<bool> registerOrder(
       BuildContext context, int orderId, User courier) async {
     try {
-      var res = await http.post(
-        Constant.serverName +
-            Constant.orderPath +
-            '/take/' +
-            orderId.toString() +
-            '?courier_id=${courier.id}',
+      final res = await http.post(
+        '${Constant.serverName}${Constant.orderPath}/take/$orderId${'?courier_id=${courier.id}'}',
         headers: {
           'Authorization': 'Bearer ${courier.token}',
         },
@@ -151,11 +145,12 @@ class MapProvider with ChangeNotifier {
       if (res.statusCode == 200) {
         return true;
       } else {
-        var body = json.decode(res.body);
+        final body = json.decode(res.body);
 
         if (body["message"] != null) {
           AppProvider.openCustomDialog(
-              context, "Error", body["message"], false);
+              context, "Error", body["message"] as String,
+              isPop: false);
         } else {
           AppProvider.showRetryDialog(context, message: res.reasonPhrase);
         }
@@ -163,7 +158,6 @@ class MapProvider with ChangeNotifier {
         return false;
       }
     } catch (e) {
-      print(e);
       // show retry dialog
       AppProvider.showRetryDialog(context);
       return false;
@@ -191,7 +185,7 @@ class MapProvider with ChangeNotifier {
   }
 
   void moveCameraBounds(LatLng from, LatLng to) {
-    var sLat, sLng, nLat, nLng;
+    double sLat, sLng, nLat, nLng;
     if (from.latitude <= to.latitude) {
       sLat = from.latitude;
       nLat = to.latitude;
@@ -208,16 +202,16 @@ class MapProvider with ChangeNotifier {
       nLng = from.longitude;
     }
 
-    LatLngBounds bounds = LatLngBounds(
+    final LatLngBounds bounds = LatLngBounds(
         northeast: LatLng(nLat, nLng), southwest: LatLng(sLat, sLng));
     _mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
   }
 
   List<LatLng> _convertToLatLong(List points) {
-    List<LatLng> result = <LatLng>[];
+    final List<LatLng> result = <LatLng>[];
     for (int i = 0; i < points.length; i++) {
       if (i % 2 != 0) {
-        result.add(LatLng(points[i - 1], points[i]));
+        result.add(LatLng(points[i - 1] as double, points[i] as double));
       }
     }
     return result;

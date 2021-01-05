@@ -15,7 +15,7 @@ import 'package:http/http.dart' as http;
 import '../constant.dart';
 import 'appProvider.dart';
 
-enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
+enum Status { uninitialized, authenticated, authenticating, unauthenticated }
 
 class LoginModel {
   String email;
@@ -30,12 +30,12 @@ class LoginModel {
 }
 
 class UserProvider extends ChangeNotifier {
-  Status _status = Status.Uninitialized;
+  Status _status = Status.uninitialized;
   Status get status => _status;
 
   final picker = ImagePicker();
   File _pimage;
-  get pImage => _pimage;
+  File get pImage => _pimage;
 
   LoginModel loginModel = LoginModel();
 
@@ -48,8 +48,8 @@ class UserProvider extends ChangeNotifier {
   Future loginSubmit(BuildContext context) async {
     // post the login form
     try {
-      http.Response result = await http.post(
-        Constant.serverName + Constant.accountPath + '/login',
+      final http.Response result = await http.post(
+        '${Constant.serverName}${Constant.accountPath}/login',
         body: json.encode(loginModel.toMap()),
         headers: {
           'Content-type': 'application/json',
@@ -57,9 +57,8 @@ class UserProvider extends ChangeNotifier {
       );
 
       if (result.statusCode == 200) {
-        print(result.body);
-
-        final User user = User.fromJson(json.decode(result.body));
+        final User user =
+            User.fromJson(json.decode(result.body) as Map<String, dynamic>);
         // chec whether is onBoard
         if (!user.onBoard) {
           // set user in prefs
@@ -80,16 +79,17 @@ class UserProvider extends ChangeNotifier {
           );
         }
       } else {
-        var body = json.decode(result?.body);
+        final body = json.decode(result?.body);
 
         if (body["message"] != null) {
-          AppProvider.openCustomDialog(context, "Error", body["message"], true);
+          AppProvider.openCustomDialog(
+              context, "Error", body["message"] as String,
+              isPop: true);
         } else {
           AppProvider.showRetryDialog(context, message: result.reasonPhrase);
         }
       }
     } catch (e) {
-      print(e);
       // show retry dialog
       AppProvider.showRetryDialog(context);
     }
@@ -97,32 +97,33 @@ class UserProvider extends ChangeNotifier {
 
   Future registrationSubmit(BuildContext context) async {
     try {
-      http.Response result = await http.post(
-        Constant.serverName + Constant.accountPath + '/register',
+      final http.Response result = await http.post(
+        '${Constant.serverName}${Constant.accountPath}/register',
         body: json.encode(registrationModel.toMap()),
         headers: {
           'Content-type': 'application/json',
         },
       );
 
-      print(result.statusCode);
       if (result.statusCode == 200) {
         AppProvider.openCustomDialog(
-            context,
-            "Registration sent",
-            "You will receive email confirmation after your registration been approved",
-            false);
+          context,
+          "Registration sent",
+          "You will receive email confirmation after your registration been approved",
+          isPop: false,
+        );
       } else {
-        var body = json.decode(result?.body);
+        final body = json.decode(result?.body);
 
         if (body["message"] != null) {
-          AppProvider.openCustomDialog(context, "Error", body["message"], true);
+          AppProvider.openCustomDialog(
+              context, "Error", body["message"] as String,
+              isPop: true);
         } else {
           AppProvider.showRetryDialog(context, message: result.reasonPhrase);
         }
       }
     } catch (e) {
-      print(e);
       // show retry dialog
       AppProvider.showRetryDialog(context);
     }
@@ -138,73 +139,67 @@ class UserProvider extends ChangeNotifier {
           base64Encode(_pimage.readAsBytesSync());
       // read image name
       registrationModel.profilePictureName = pickedFile.path.split('/').last;
-      print(registrationModel.profilePicture);
-    } else {
-      print('No image selected.');
     }
 
     notifyListeners();
   }
 
-  void showPickImageModal(context) {
+  void showPickImageModal(BuildContext context) {
     // show modal selection
     showModalBottomSheet(
         context: context,
         builder: (_) {
-          return Container(
-            child: Wrap(
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Choose Option",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15.5),
-                    ),
+          return Wrap(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: const Align(
+                  child: Text(
+                    "Choose Option",
+                    style:
+                        TextStyle(fontWeight: FontWeight.w500, fontSize: 15.5),
                   ),
                 ),
-                ListTile(
-                  leading: Icon(Icons.image),
-                  title: Text('From Gallery'),
-                  onTap: () {
-                    getImage(ImageSource.gallery);
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.camera_alt),
-                  title: Text('From Camera'),
-                  onTap: () {
-                    getImage(ImageSource.camera);
-                    Navigator.pop(context);
-                  },
-                )
-              ],
-            ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.image),
+                title: const Text('From Gallery'),
+                onTap: () {
+                  getImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('From Camera'),
+                onTap: () {
+                  getImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+              )
+            ],
           );
         });
   }
 
-  void getDocument(ImageSource source, String docName) async {
+  Future getDocument(ImageSource source, String docName) async {
     final pickedFile = await picker.getImage(source: source);
 
     if (pickedFile != null) {
-      Document d = new Document();
+      final Document d = Document();
       d.name = docName;
       // read base64 image
-      var bytes = await pickedFile.readAsBytes();
+      final bytes = await pickedFile.readAsBytes();
       d.document = base64Encode(bytes);
 
       // read image name
       d.documentName = pickedFile.path.split('/').last;
 
-      if (registrationModel.documents.length == 0) {
+      if (registrationModel.documents.isEmpty) {
         registrationModel.documents.add(d);
       } else {
-        var i =
+        final i =
             registrationModel.documents.indexWhere((e) => e.name == docName);
         if (i >= 0) {
           registrationModel.documents.removeAt(i);
@@ -213,8 +208,6 @@ class UserProvider extends ChangeNotifier {
           registrationModel.documents.add(d);
         }
       }
-    } else {
-      print('No image selected.');
     }
 
     notifyListeners();
@@ -225,7 +218,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future setUserPrefs(User u) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     prefs.setInt("uid", u.id);
     prefs.setString("name", u.name);
@@ -237,9 +230,9 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<User> getUserFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    var u = User()
+    final u = User()
       ..id = prefs.getInt("uid")
       ..name = prefs.getString("name")
       ..phoneNum = prefs.getString("phoneNum")
@@ -252,26 +245,26 @@ class UserProvider extends ChangeNotifier {
   }
 
   Stream<User> validateAuthState() async* {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if (prefs.containsKey("uid")) {
-      _status = Status.Authenticated;
+      _status = Status.authenticated;
       // set prefs value to user variable
-      var u = await getUserFromPrefs();
+      final u = await getUserFromPrefs();
       yield u;
     } else {
-      _status = Status.Unauthenticated;
+      _status = Status.unauthenticated;
       // end the future
       yield null;
     }
   }
 
   Future signOut() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     // clear prefs
-    prefs.clear();
+    await prefs.clear();
 
-    _status = Status.Unauthenticated;
+    _status = Status.unauthenticated;
     notifyListeners();
     return Future.delayed(Duration.zero);
   }

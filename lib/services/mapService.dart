@@ -7,34 +7,34 @@ import 'package:http/http.dart' as http;
 
 class MapService {
   Future<RouteModel> getRouteByCoordinates(LatLng l1, LatLng l2) async {
-    var apikey = FlutterConfig.get('GOOGLE_MAPS_API_KEY');
+    final apikey = FlutterConfig.get('GOOGLE_MAPS_API_KEY');
 
-    String url =
+    final String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apikey";
-    http.Response response = await http.get(url);
+    final http.Response response = await http.get(url);
 
-    Map values = jsonDecode(response.body);
-    Map routes = values["routes"][0];
-    Map legs = values["routes"][0]["legs"][0];
+    final Map values = jsonDecode(response.body) as Map<String, dynamic>;
+    final Map routes = values["routes"][0] as Map<String, dynamic>;
+    final Map legs = values["routes"][0]["legs"][0] as Map<String, dynamic>;
 
-    RouteModel route = RouteModel(
-      points: routes["overview_polyline"]["points"],
-      distance: Distance.fromMap(legs['distance']),
-      timeNeeded: TimeNeeded.fromMap(legs['duration']),
-      endAddress: legs['end_address'],
-      startAddress: legs['end_address'],
+    final RouteModel route = RouteModel(
+      points: routes["overview_polyline"]["points"] as String,
+      distance: Distance.fromMap(legs['distance'] as Map<String, dynamic>),
+      timeNeeded: TimeNeeded.fromMap(legs['duration'] as Map<String, dynamic>),
+      endAddress: legs['end_address'] as String,
+      startAddress: legs['end_address'] as String,
     );
 
     return route;
   }
 
   List decodePoly(String poly) {
-    var list = poly.codeUnits;
-    var lList = new List();
+    final list = poly.codeUnits;
+    final lList = [];
     int index = 0;
-    int len = poly.length;
+    final int len = poly.length;
     int c = 0;
-// repeating until all attributes are decoded
+    // repeating until all attributes are decoded
     do {
       var shift = 0;
       int result = 0;
@@ -50,12 +50,14 @@ class MapService {
       if (result & 1 == 1) {
         result = ~result;
       }
-      var result1 = (result >> 1) * 0.00001;
+      final result1 = (result >> 1) * 0.00001;
       lList.add(result1);
     } while (index < len);
 
-/*adding to previous value as done in encoding */
-    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    /*adding to previous value as done in encoding */
+    for (var i = 2; i < lList.length; i++) {
+      lList[i] += lList[i - 2];
+    }
 
     return lList;
   }

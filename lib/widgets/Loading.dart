@@ -8,7 +8,7 @@ class Loading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: SpinKitFadingCircle(
+      child: const SpinKitFadingCircle(
         color: Constant.primaryColor,
         size: 30,
       ),

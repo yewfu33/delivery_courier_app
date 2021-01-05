@@ -50,7 +50,7 @@ class _PaymentSectionState extends State<PaymentSection> {
 
   Future<double> readCourierCommission() async {
     try {
-      var res = await http.get(
+      final res = await http.get(
         getCourierCommissionPath + widget.user.id.toString(),
         headers: {
           "authorization": "Bearer ${widget.user.token}",
@@ -65,14 +65,13 @@ class _PaymentSectionState extends State<PaymentSection> {
 
       return null;
     } catch (e) {
-      print("fail to get commission");
       return null;
     }
   }
 
   Future<bool> addPayment(BuildContext context) async {
     try {
-      var postBody = PaymentModel(
+      final postBody = PaymentModel(
         amount: widget.order.price,
         courierPay: widget.order.price * commission,
         orderId: widget.order.orderId,
@@ -80,7 +79,7 @@ class _PaymentSectionState extends State<PaymentSection> {
         userId: widget.order.userId,
       );
 
-      var res = await http.post(
+      final res = await http.post(
         addPaymentPath,
         headers: {
           "authorization": "Bearer ${widget.user.token}",
@@ -100,7 +99,6 @@ class _PaymentSectionState extends State<PaymentSection> {
         return false;
       }
     } catch (e) {
-      print("fail add payment");
       showRetryDialog(context);
       return false;
     }
@@ -112,19 +110,19 @@ class _PaymentSectionState extends State<PaymentSection> {
       barrierDismissible: true,
       builder: (_) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
+          colorScheme: const ColorScheme.light().copyWith(
             primary: Constant.primaryColor,
           ),
         ),
         child: AlertDialog(
-          title: Text("Error"),
-          content: Text("Something went wrong try again later."),
+          title: const Text("Error"),
+          content: const Text("Something went wrong try again later."),
           actions: [
             FlatButton(
               onPressed: () {
                 Navigator.of(_).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             )
           ],
         ),
@@ -141,10 +139,10 @@ class _PaymentSectionState extends State<PaymentSection> {
           GreyBoxContainer(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+              children: const [
                 Text(
                   'Payments',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
@@ -159,20 +157,20 @@ class _PaymentSectionState extends State<PaymentSection> {
               children: [
                 TableRow(
                   children: [
-                    CustomTableCell(content: Text('Order fee')),
+                    const CustomTableCell(content: Text('Order fee')),
                     CustomTableCell(content: Text('RM ${widget.order.price}')),
                   ],
                 ),
                 TableRow(
                   children: [
-                    CustomTableCell(content: Text('Your Commission')),
+                    const CustomTableCell(content: Text('Your Commission')),
                     CustomTableCell(
                         content: Text((commission != null)
                             ? 'RM ${widget.order.price * commission}'
                             : '')),
                   ],
                 ),
-                TableRow(
+                const TableRow(
                   children: [
                     CustomTableCell(content: Text('Payment Method')),
                     CustomTableCell(content: Text('Cash Payment')),
@@ -180,7 +178,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                 ),
                 TableRow(
                   children: [
-                    CustomTableCell(content: Text('Payment Status')),
+                    const CustomTableCell(content: Text('Payment Status')),
                     CustomTableCell(content: Text(paymentStatus)),
                   ],
                 ),
@@ -189,14 +187,14 @@ class _PaymentSectionState extends State<PaymentSection> {
           ),
           const SizedBox(height: 14),
           FlatButton.icon(
-            onPressed: (loading)
+            onPressed: loading
                 ? null
                 : () async {
                     setState(() {
                       loading = true;
                     });
 
-                    var success = await addPayment(context);
+                    final success = await addPayment(context);
 
                     if (success) {
                       model.notifyPaid();
@@ -206,9 +204,9 @@ class _PaymentSectionState extends State<PaymentSection> {
                       });
                     }
                   },
-            icon: Icon(Icons.payment),
+            icon: const Icon(Icons.payment),
             color: Colors.grey[300],
-            label: Text('Add Payment'),
+            label: const Text('Add Payment'),
           ),
         ],
       ),
