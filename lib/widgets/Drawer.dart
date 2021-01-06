@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/pages/myTaskPage.dart';
+import 'package:delivery_courier_app/pages/revenuePage.dart';
 import 'package:delivery_courier_app/pages/settingsPage.dart';
 import 'package:delivery_courier_app/providers/appProvider.dart';
 import 'package:delivery_courier_app/providers/userProvider.dart';
@@ -77,40 +78,37 @@ class MyDrawer extends StatelessWidget {
               leading: const FaIcon(FontAwesomeIcons.truckLoading),
             ),
             DrawerListTile(
-              onTap: () => changeScreen(
-                context,
-                Provider<User>.value(
-                  value: user,
-                  builder: (_, __) => MyTaskPage(),
-                ),
-              ),
+              onTap: () => changeScreen(context, MyTaskPage(user: user)),
               text: "My Task",
               leading: const FaIcon(FontAwesomeIcons.history),
-            ),
-            const DrawerListTile(
-              onTap: null,
-              text: "Earnings",
-              leading: FaIcon(FontAwesomeIcons.wallet),
             ),
             DrawerListTile(
               onTap: () {
                 changeScreen(
                   context,
-                  Provider<User>.value(
-                    value: user,
-                    builder: (_, __) => SettingsPage(),
-                  ),
+                  RevenuePage(user: user),
+                );
+              },
+              text: "Earnings",
+              leading: const FaIcon(FontAwesomeIcons.wallet),
+            ),
+            DrawerListTile(
+              onTap: () {
+                changeScreen(
+                  context,
+                  SettingsPage(user: user),
                 );
               },
               text: "Settings",
               leading: const FaIcon(FontAwesomeIcons.slidersH),
             ),
             ListTile(
-              title: FlatButton(
+              title: FlatButton.icon(
                 onPressed: () {
                   Provider.of<UserProvider>(context, listen: false).signOut();
                 },
-                child: const Text('logout'),
+                icon: const Icon(Icons.exit_to_app),
+                label: const Text('logout'),
               ),
             ),
           ],

@@ -12,6 +12,10 @@ import 'package:provider/provider.dart';
 import '../constant.dart';
 
 class MyTaskPage extends StatelessWidget {
+  final User user;
+
+  const MyTaskPage({Key key, @required this.user}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context, listen: false);

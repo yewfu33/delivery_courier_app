@@ -44,9 +44,9 @@ class AppProvider extends ChangeNotifier {
 
       return res;
     } on SocketException {
-      throw Exception('failed to fetch pick order');
+      throw Exception('Make sure device is connected with the internet');
     } catch (e) {
-      throw Exception('failed to fetch pick order');
+      throw Exception('Failed to fetch order, try again later');
     }
   }
 

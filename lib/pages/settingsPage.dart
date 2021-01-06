@@ -3,15 +3,15 @@ import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/user.dart';
 import 'package:delivery_courier_app/pages/profilePage.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../constant.dart';
 
 class SettingsPage extends StatelessWidget {
+  final User user;
+
+  const SettingsPage({Key key, @required this.user}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context, listen: false);
-
     const Widget _rightArrow = Icon(Icons.chevron_right, size: 26);
 
     return Scaffold(
