@@ -16,8 +16,7 @@ class AvailableOrdersPage extends StatefulWidget {
 class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
   @override
   Widget build(BuildContext context) {
-    final AppProvider provider =
-        Provider.of<AppProvider>(context, listen: false);
+    final AppProvider provider = Provider.of<AppProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +36,6 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
           Container(
             padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
                   //   'Web, 1 August',
@@ -47,7 +45,15 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Icon(Icons.format_line_spacing)
+                const Spacer(),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    setState(() {});
+                  },
+                ),
               ],
             ),
           ),
@@ -73,7 +79,9 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                 if (snapshot.hasError) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Center(child: Text(snapshot.error.toString()))],
+                    children: [
+                      Center(child: Text(snapshot.error.toString())),
+                    ],
                   );
                 }
 
@@ -81,7 +89,7 @@ class _AvailableOrdersPageState extends State<AvailableOrdersPage> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Center(child: Text('No orders avaiable at the moment.'))
+                      Center(child: Text('No orders avaiable at the moment.')),
                     ],
                   );
                 }

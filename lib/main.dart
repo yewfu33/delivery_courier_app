@@ -74,7 +74,7 @@ class MyHomePage extends StatelessWidget {
               return LoginPage();
 
             case Status.authenticated:
-              return ChangeNotifierProvider.value(
+              return Provider.value(
                 value: AppProvider.user(
                   user: snapshot.data,
                 ),

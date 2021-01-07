@@ -70,7 +70,7 @@ class TaskProvider extends ChangeNotifier {
     @required this.order,
   }) {
     // initliaze from the order
-    _status = DeliveryStatus.startDeliveryTask;
+    _status = DeliveryStatus.markArrivedPickUp;
     _clock = "${extractTimeFormat(order.dateTime)} - Pick-up";
     _currentTel = order.user.phoneNum;
     _currentAddress = order.address;
