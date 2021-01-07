@@ -4,19 +4,25 @@ import 'dart:io';
 import 'package:delivery_courier_app/helpers/screen_navigation.dart';
 import 'package:delivery_courier_app/model/orderModel.dart';
 import 'package:delivery_courier_app/model/user.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart' as http;
+import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 
 import '../constant.dart';
 
-class AppProvider extends ChangeNotifier {
+class AppProvider {
   Future<List<OrderModel>> _orders;
 
   Future<List<OrderModel>> get orders => _orders;
 
   final User user;
+  http.IOClient httpClient;
 
-  AppProvider.user({@required this.user});
+  AppProvider.user({@required this.user}) {
+    // wrap with ioclient to handle connection timeout
+    httpClient = http.IOClient(
+        HttpClient()..connectionTimeout = const Duration(seconds: 15));
+  }
 
   Stream<List<OrderModel>> ordersStream() async* {
     try {
@@ -32,9 +38,9 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
-  Future<http.Response> getAllOrders() async {
+  Future<Response> getAllOrders() async {
     try {
-      final res = await http.get(
+      final res = await httpClient.get(
         Constant.serverName + Constant.orderPath,
         headers: {
           'Content-type': 'application/json',
@@ -59,7 +65,7 @@ class AppProvider extends ChangeNotifier {
 
   Future<List<OrderModel>> fetchOrders() async {
     try {
-      final http.Response res = await getAllOrders();
+      final Response res = await getAllOrders();
       if (res == null) throw Exception('failed to fetch pick order');
 
       if (res.statusCode == 200) {
