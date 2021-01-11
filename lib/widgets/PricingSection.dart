@@ -38,7 +38,7 @@ class PriceSection extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Your Commission"),
-                  Text("RM $commission"),
+                  Text("RM ${commission.toStringAsFixed(2)}"),
                 ],
               ),
               const SizedBox(height: 10),

@@ -166,7 +166,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                     const CustomTableCell(content: Text('Your Commission')),
                     CustomTableCell(
                         content: Text((commission != null)
-                            ? 'RM ${widget.order.price * commission}'
+                            ? 'RM ${(widget.order.price * commission).toStringAsFixed(2)}'
                             : '')),
                   ],
                 ),
